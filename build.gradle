@@ -18,6 +18,7 @@ allprojects {
         implementation 'org.apache.commons:commons-dbcp2:2.9.0'
         compileOnly 'javax.servlet:servlet-api:3.0-alpha-1'
         implementation 'org.postgresql:postgresql:42.3.3'
+        implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.2.2'
     }
 }
 

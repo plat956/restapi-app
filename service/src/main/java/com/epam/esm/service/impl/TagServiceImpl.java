@@ -6,16 +6,26 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import repository.TagRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
 public class TagServiceImpl implements TagService {
 
-    @Autowired
     private TagRepository tagRepository;
 
+    @Autowired
+    public TagServiceImpl(TagRepository tagRepository) {
+        this.tagRepository = tagRepository;
+    }
+
     @Override
-    public Optional<Tag> findById(Long id) {
-        return tagRepository.findById(id);
+    public Optional<Tag> findOne(Long id) {
+        return tagRepository.findOne(id);
+    }
+
+    @Override
+    public List<Tag> findAll() {
+        return tagRepository.findAll();
     }
 }

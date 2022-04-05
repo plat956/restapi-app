@@ -35,6 +35,6 @@ public class RootConfig {
 
     @Bean
     public TagRepository tagRepository() {
-        return new TagRepository();
+        return new TagRepository(jdbcTemplate());
     }
 }
