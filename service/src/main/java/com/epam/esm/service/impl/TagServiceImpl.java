@@ -28,4 +28,14 @@ public class TagServiceImpl implements TagService {
     public List<Tag> findAll() {
         return tagRepository.findAll();
     }
+
+    @Override
+    public Tag save(Tag tag) {
+        return tagRepository.save(tag);
+    }
+
+    @Override
+    public void delete(Long id) {
+        tagRepository.delete(id);
+    }
 }

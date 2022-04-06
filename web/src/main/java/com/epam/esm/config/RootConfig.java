@@ -6,6 +6,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import repository.TagRepository;
 
 @Configuration
@@ -34,7 +35,12 @@ public class RootConfig {
     }
 
     @Bean
+    public SimpleJdbcInsert simpleJdbcInsert() {
+        return new SimpleJdbcInsert(jdbcTemplate());
+    }
+
+    @Bean
     public TagRepository tagRepository() {
-        return new TagRepository(jdbcTemplate());
+        return new TagRepository();
     }
 }
