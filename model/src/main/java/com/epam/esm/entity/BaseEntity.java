@@ -1,6 +1,8 @@
 package com.epam.esm.entity;
 
-public abstract class BaseEntity<T> {
+import java.io.Serializable;
+
+public abstract class BaseEntity<T> implements Serializable {
 
     private T id;
 

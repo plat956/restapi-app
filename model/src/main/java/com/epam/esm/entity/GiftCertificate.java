@@ -1,7 +1,10 @@
 package com.epam.esm.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Set;
 
 public class GiftCertificate extends BaseEntity<Long> {
 
@@ -9,8 +12,11 @@ public class GiftCertificate extends BaseEntity<Long> {
     private String description;
     private BigDecimal price;
     private Integer duration;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime createDate;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime lastUpdateDate;
+    private Set<Tag> tags;
 
     public GiftCertificate() {
     }
@@ -61,6 +67,14 @@ public class GiftCertificate extends BaseEntity<Long> {
 
     public void setLastUpdateDate(LocalDateTime lastUpdateDate) {
         this.lastUpdateDate = lastUpdateDate;
+    }
+
+    public Set<Tag> getTags() {
+        return tags;
+    }
+
+    public void setTags(Set<Tag> tags) {
+        this.tags = tags;
     }
 
     @Override
