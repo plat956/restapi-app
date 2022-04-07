@@ -13,10 +13,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static repository.impl.IdentityStorage.*;
+
 @Repository
 public class TagRepositoryImpl implements TagRepository {
 
     private static final String FIND_BY_ID_QUERY = "SELECT id, name FROM tag WHERE id = ?";
+    private static final String FIND_BY_NAME = "SELECT id, name FROM tag WHERE name = ?";
     private static final String FIND_ALL_QUERY = "SELECT id, name FROM tag";
     private static final String FIND_BY_GIFT_CERTIFICATE_ID = """
             SELECT t.id, t.name FROM tag t
@@ -36,13 +39,14 @@ public class TagRepositoryImpl implements TagRepository {
     @Autowired
     public void setSimpleJdbcInsert(SimpleJdbcInsert simpleJdbcInsert) {
         this.simpleJdbcInsert = simpleJdbcInsert;
-        this.simpleJdbcInsert.withTableName("tag").usingGeneratedKeyColumns("id");
+        this.simpleJdbcInsert.withTableName(TAG_TABLE_NAME).usingGeneratedKeyColumns(ENTITY_ID);
     }
 
     @Override
     public Optional<Tag> findOne(Long id) {
         try {
-            Tag tag = jdbcTemplate.queryForObject(FIND_BY_ID_QUERY, new BeanPropertyRowMapper<>(Tag.class), id);
+            Tag tag = jdbcTemplate.queryForObject(FIND_BY_ID_QUERY,
+                    new BeanPropertyRowMapper<>(Tag.class), id);
             return Optional.of(tag);
         } catch (EmptyResultDataAccessException e) {
             return Optional.empty();
@@ -56,14 +60,14 @@ public class TagRepositoryImpl implements TagRepository {
 
     @Override
     public Tag save(Tag entity) {
-        Number newId = simpleJdbcInsert.executeAndReturnKey(Map.of("name", entity.getName()));
+        Number newId = simpleJdbcInsert.executeAndReturnKey(Map.of(TAG_NAME, entity.getName()));
         entity.setId(newId.longValue());
         return entity;
     }
 
     @Override
     public Tag update(Tag entity) {
-        throw new UnsupportedOperationException("Update method of Tag entity is not supported");
+        throw new UnsupportedOperationException("Update method of a Tag entity is not supported");
     }
 
     @Override
@@ -74,5 +78,15 @@ public class TagRepositoryImpl implements TagRepository {
     @Override
     public List<Tag> findByGiftCertificateId(Long id) {
         return jdbcTemplate.query(FIND_BY_GIFT_CERTIFICATE_ID, new BeanPropertyRowMapper<>(Tag.class), id);
+    }
+
+    @Override
+    public Optional<Tag> findByName(String name) {
+        try {
+            Tag tag = jdbcTemplate.queryForObject(FIND_BY_NAME, new BeanPropertyRowMapper<>(Tag.class), name);
+            return Optional.of(tag);
+        } catch (EmptyResultDataAccessException e) {
+            return Optional.empty();
+        }
     }
 }

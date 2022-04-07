@@ -35,7 +35,12 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     }
 
     @Override
-    public void delete(Long id) {
+    public GiftCertificate update(GiftCertificate tag) {
+        return giftCertificateRepository.update(tag);
+    }
 
+    @Override
+    public void delete(Long id) {
+        giftCertificateRepository.delete(id);
     }
 }

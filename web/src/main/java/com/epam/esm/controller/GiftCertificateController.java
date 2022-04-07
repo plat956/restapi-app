@@ -3,6 +3,7 @@ package com.epam.esm.controller;
 import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.exception.ResourceNotFoundException;
 import com.epam.esm.service.GiftCertificateService;
+import com.epam.esm.util.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -36,4 +37,16 @@ public class GiftCertificateController {
         return giftCertificateService.save(giftCertificate);
     }
 
+    @PatchMapping("/{id}")
+    public GiftCertificate update(@PathVariable("id") Long id, @RequestBody GiftCertificate source) {
+        GiftCertificate target = giftCertificateService.findOne(id).orElseThrow(() -> new ResourceNotFoundException(id));
+        ObjectUtils.merge(source, target);
+        return giftCertificateService.update(target);
+    }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(@PathVariable("id") Long id) {
+        giftCertificateService.delete(id);
+    }
 }

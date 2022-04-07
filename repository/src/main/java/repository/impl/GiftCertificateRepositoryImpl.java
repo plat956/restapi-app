@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +18,8 @@ import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.*;
 
+import static repository.impl.IdentityStorage.*;
+
 @Repository
 public class GiftCertificateRepositoryImpl implements GiftCertificateRepository {
 
@@ -27,7 +30,13 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
         SELECT id, name, description, price, duration, create_date, last_update_date 
         FROM gift_certificate""";
     private static final String CREATE_CERTIFICATE_TAG_RELATIONSHIP_QUERY = """
-        INSERT INTO gift_certificate_tag (gift_certificate_id, tag_id) VALUES (?, ?)""";
+        INSERT INTO gift_certificate_tag (gift_certificate_id, tag_id) VALUES (?, ?) 
+        ON CONFLICT DO NOTHING""";
+    private static final String UPDATE_QUERY = """
+        UPDATE gift_certificate 
+        SET name = ?, description = ?, price = ?, duration = ?, create_date = ?, last_update_date = ?
+        WHERE id = ?""";
+    private static final String DELETE_BY_ID_QUERY = "DELETE FROM gift_certificate WHERE id = ?";
 
     private JdbcTemplate jdbcTemplate;
     private SimpleJdbcInsert simpleJdbcInsert;
@@ -41,7 +50,7 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
     @Autowired
     public void setSimpleJdbcInsert(SimpleJdbcInsert simpleJdbcInsert) {
         this.simpleJdbcInsert = simpleJdbcInsert;
-        this.simpleJdbcInsert.withTableName("gift_certificate").usingGeneratedKeyColumns("id");
+        this.simpleJdbcInsert.withTableName(CERTIFICATE_TABLE_NAME).usingGeneratedKeyColumns(ENTITY_ID);
     }
 
     @Autowired
@@ -68,50 +77,69 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
     @Override
     @Transactional
     public GiftCertificate save(GiftCertificate certificate) {
-        Map<String, Object> params = new HashMap<>();
-        params.put("name", certificate.getName());
-        params.put("description", certificate.getDescription());
-        params.put("price", certificate.getPrice());
-        params.put("duration", certificate.getDuration());
-        params.put("create_date", certificate.getCreateDate());
-        params.put("last_update_date", certificate.getLastUpdateDate());
-
+        MapSqlParameterSource params = new MapSqlParameterSource()
+                .addValue(CERTIFICATE_NAME, certificate.getName())
+                .addValue(CERTIFICATE_DESCRIPTION, certificate.getDescription())
+                .addValue(CERTIFICATE_PRICE, certificate.getPrice())
+                .addValue(CERTIFICATE_DURATION, certificate.getDuration())
+                .addValue(CERTIFICATE_CREATE_DATE, certificate.getCreateDate())
+                .addValue(CERTIFICATE_LAST_UPDATE_DATE, certificate.getLastUpdateDate());
         Number newId = simpleJdbcInsert.executeAndReturnKey(params);
         certificate.setId(newId.longValue());
-
-        certificate.getTags().forEach(t -> {
-            Tag tag = tagRepository.save(t);
-            createGiftCertificateTagRelationship(certificate.getId(), tag.getId());
-        });
-
+        updateTags(certificate);
         return certificate;
     }
 
     @Override
-    public GiftCertificate update(GiftCertificate entity) {
-        return null;
+    @Transactional
+    public GiftCertificate update(GiftCertificate certificate) {
+        jdbcTemplate.update(UPDATE_QUERY,
+                certificate.getName(),
+                certificate.getDescription(),
+                certificate.getPrice(),
+                certificate.getDuration(),
+                certificate.getCreateDate(),
+                certificate.getLastUpdateDate(),
+                certificate.getId()
+        );
+        updateTags(certificate);
+
+        List<Tag> tags = tagRepository.findByGiftCertificateId(certificate.getId());
+        certificate.setTags(new HashSet<>(tags));
+        return certificate;
     }
 
     @Override
     public void delete(Long id) {
-
+        jdbcTemplate.update(DELETE_BY_ID_QUERY, id);
     }
 
-    private void createGiftCertificateTagRelationship(Long certificateId, Long tagId) {
-        jdbcTemplate.update(CREATE_CERTIFICATE_TAG_RELATIONSHIP_QUERY, certificateId, tagId);
+    //todo transactional? find it out
+    private void updateTags(GiftCertificate certificate) {
+        certificate.getTags().forEach(t -> {
+            Optional<Tag> existingTag = tagRepository.findByName(t.getName());
+            Tag tag;
+            if(existingTag.isPresent()) {
+                tag = existingTag.get();
+            } else {
+                tag = tagRepository.save(t);
+            }
+            t.setId(tag.getId());
+            jdbcTemplate.update(CREATE_CERTIFICATE_TAG_RELATIONSHIP_QUERY, certificate.getId(), tag.getId());
+        });
     }
 
     private class GiftCertificateRowMapper implements RowMapper<GiftCertificate> {
         @Override
         public GiftCertificate mapRow(ResultSet rs, int rowNum) throws SQLException {
             GiftCertificate cert = new GiftCertificate();
-            cert.setId(rs.getLong(1));
-            cert.setName(rs.getString(2));
-            cert.setDescription(rs.getString(3));
-            cert.setPrice(rs.getBigDecimal(4));
-            cert.setDuration(rs.getInt(5));
-            cert.setCreateDate(rs.getObject(6, LocalDateTime.class));
-            cert.setLastUpdateDate(rs.getObject(7, LocalDateTime.class));
+            cert.setId(rs.getLong(ENTITY_ID));
+            cert.setName(rs.getString(CERTIFICATE_NAME));
+            cert.setDescription(rs.getString(CERTIFICATE_DESCRIPTION));
+            cert.setPrice(rs.getBigDecimal(CERTIFICATE_PRICE));
+            cert.setDuration(rs.getInt(CERTIFICATE_DURATION));
+            cert.setCreateDate(rs.getObject(CERTIFICATE_CREATE_DATE, LocalDateTime.class));
+            cert.setLastUpdateDate(rs.getObject(CERTIFICATE_LAST_UPDATE_DATE, LocalDateTime.class));
 
             List<Tag> tags = tagRepository.findByGiftCertificateId(cert.getId());
             cert.setTags(new HashSet<>(tags));

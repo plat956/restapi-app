@@ -1,6 +1,7 @@
 package com.epam.esm.config;
 
 import org.apache.commons.dbcp2.BasicDataSource;
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.YamlPropertiesFactoryBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -9,7 +10,6 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -43,12 +43,7 @@ public class RootConfig {
     }
 
     @Bean
-    public NamedParameterJdbcTemplate namedParameterJdbcTemplate() {
-        return new NamedParameterJdbcTemplate(dataSource());
-    }
-
-    @Bean
-    @Scope("prototype")
+    @Scope(BeanDefinition.SCOPE_PROTOTYPE)
     public SimpleJdbcInsert simpleJdbcInsert() {
         return new SimpleJdbcInsert(jdbcTemplate());
     }

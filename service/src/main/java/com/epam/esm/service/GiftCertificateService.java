@@ -9,5 +9,6 @@ public interface GiftCertificateService {
     Optional<GiftCertificate> findOne(Long id);
     List<GiftCertificate> findAll();
     GiftCertificate save(GiftCertificate tag);
+    GiftCertificate update(GiftCertificate tag);
     void delete(Long id);
 }
