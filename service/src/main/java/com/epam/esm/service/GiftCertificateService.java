@@ -8,7 +8,8 @@ import java.util.Optional;
 public interface GiftCertificateService {
     Optional<GiftCertificate> findOne(Long id);
     List<GiftCertificate> findAll();
-    GiftCertificate save(GiftCertificate tag);
-    GiftCertificate update(GiftCertificate tag);
+    List<GiftCertificate> findAll(String certificate, String search, String sort);
+    GiftCertificate save(GiftCertificate certificate);
+    GiftCertificate update(Long id, GiftCertificate certificate);
     void delete(Long id);
 }

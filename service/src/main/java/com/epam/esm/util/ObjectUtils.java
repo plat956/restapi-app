@@ -5,16 +5,21 @@ import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
 
 import java.beans.PropertyDescriptor;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Stream;
 
 public final class ObjectUtils {
 
     private ObjectUtils() {
     }
 
-    public static <T> void merge(T source, T target) {
-        BeanUtils.copyProperties(source, target, getNullPropertyNames(source));
+    public static <T> void merge(T source, T target, String... excludedProps) {
+        String[] nullProps = getNullPropertyNames(source);
+        String[] props = Stream.concat(Arrays.stream(excludedProps), Arrays.stream(nullProps))
+                .toArray(String[]::new);
+        BeanUtils.copyProperties(source, target, props);
     }
 
     private static <T> String[] getNullPropertyNames(T source) {

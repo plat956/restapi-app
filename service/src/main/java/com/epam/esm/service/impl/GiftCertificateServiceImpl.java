@@ -2,10 +2,12 @@ package com.epam.esm.service.impl;
 
 import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.service.GiftCertificateService;
+import com.epam.esm.util.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import repository.GiftCertificateRepository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,13 +32,23 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     }
 
     @Override
-    public GiftCertificate save(GiftCertificate giftCertificate) {
-        return giftCertificateRepository.save(giftCertificate);
+    public List<GiftCertificate> findAll(String certificate, String search, String sort) {
+        return giftCertificateRepository.findAll(certificate, search, sort);
     }
 
     @Override
-    public GiftCertificate update(GiftCertificate tag) {
-        return giftCertificateRepository.update(tag);
+    public GiftCertificate save(GiftCertificate certificate) {
+        certificate.setCreateDate(LocalDateTime.now());
+        certificate.setLastUpdateDate(null);
+        return giftCertificateRepository.save(certificate);
+    }
+
+    @Override
+    public GiftCertificate update(Long id, GiftCertificate certificate) {
+        GiftCertificate updatedCertificate = findOne(id).get(); //todo not found ex?
+        ObjectUtils.merge(certificate, updatedCertificate, "createDate", "lastUpdateDate");
+        updatedCertificate.setLastUpdateDate(LocalDateTime.now());
+        return giftCertificateRepository.update(updatedCertificate);
     }
 
     @Override

@@ -2,6 +2,7 @@ package repository.impl;
 
 import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.entity.Tag;
+import com.google.common.base.CaseFormat;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -12,13 +13,19 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import repository.GiftCertificateRepository;
 import repository.TagRepository;
+import util.OrderType;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Optional;
 
 import static repository.impl.IdentityStorage.*;
+import static util.OrderType.ASC;
+import static util.OrderType.DESC;
 
 @Repository
 public class GiftCertificateRepositoryImpl implements GiftCertificateRepository {
@@ -27,8 +34,8 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
         SELECT id, name, description, price, duration, create_date, last_update_date 
         FROM gift_certificate WHERE id = ?""";
     private static final String FIND_ALL_QUERY = """
-        SELECT id, name, description, price, duration, create_date, last_update_date 
-        FROM gift_certificate""";
+        SELECT gc.id, gc.name, gc.description, gc.price, gc.duration, gc.create_date, gc.last_update_date 
+        FROM gift_certificate gc""";
     private static final String CREATE_CERTIFICATE_TAG_RELATIONSHIP_QUERY = """
         INSERT INTO gift_certificate_tag (gift_certificate_id, tag_id) VALUES (?, ?) 
         ON CONFLICT DO NOTHING""";
@@ -37,6 +44,22 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
         SET name = ?, description = ?, price = ?, duration = ?, create_date = ?, last_update_date = ?
         WHERE id = ?""";
     private static final String DELETE_BY_ID_QUERY = "DELETE FROM gift_certificate WHERE id = ?";
+    private static final String FIND_ALL_QUERY_TAG_PART = """
+          LEFT JOIN gift_certificate_tag gct ON gc.id = gct.gift_certificate_id 
+         LEFT JOIN tag t ON t.id = gct.tag_id  WHERE t.name = ?""";
+    private static final String FIND_ALL_QUERY_WHERE_CLAUSE = " WHERE";
+    private static final String FIND_ALL_QUERY_AND_CLAUSE = " AND";
+    private static final String FIND_ALL_QUERY_ORDER_BY_CLAUSE = " ORDER BY ";
+    private static final String FIND_ALL_QUERY_ORDER_BY_COLUMN_SEPARATOR = ", ";
+    private static final String FIND_ALL_QUERY_SEARCH_PART = " (gc.name like ? OR gc.description like ?)";
+    private static final String FIND_ALL_QUERY_GROUP_BY_TAG_ID_PART = " GROUP BY gc.id";
+    private static final String FIND_ALL_QUERY_CERTIFICATE_ALIAS = "gc.";
+
+    private static final String ORDER_TYPE_REGEX = "^(\\+|\\-).*$";
+    private static final String NEGATIVE_SIGN = "-";
+    private static final String COMMA_SIGN = ",";
+    private static final String PERCENT_SIGN = "%";
+    private static final String SPACE_SIGN = " ";
 
     private JdbcTemplate jdbcTemplate;
     private SimpleJdbcInsert simpleJdbcInsert;
@@ -72,6 +95,47 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
     @Override
     public List<GiftCertificate> findAll() {
         return jdbcTemplate.query(FIND_ALL_QUERY, new GiftCertificateRowMapper());
+    }
+
+    @Override
+    public List<GiftCertificate> findAll(String tag, String search, String sort) {
+        List params = new LinkedList();
+        StringBuilder query = new StringBuilder(FIND_ALL_QUERY);
+        if(tag != null) {
+            query.append(FIND_ALL_QUERY_TAG_PART);
+            params.add(tag);
+        }
+        if(search != null) {
+            query.append(tag == null ? FIND_ALL_QUERY_WHERE_CLAUSE : FIND_ALL_QUERY_AND_CLAUSE).append(FIND_ALL_QUERY_SEARCH_PART);
+            search = PERCENT_SIGN + search + PERCENT_SIGN;
+            params.add(search);
+            params.add(search);
+        }
+        if(tag != null) {
+            query.append(FIND_ALL_QUERY_GROUP_BY_TAG_ID_PART);
+        }
+        if(sort != null) {
+            List<String> allowedColumns = List.of("name", "createDate", "lastUpdateDate");
+            OrderType orderType;
+            String orderColumn;
+            String[] fields = sort.split(COMMA_SIGN);
+            for(int i = 0; i < fields.length; i++) {
+                String field = fields[i].trim();
+                if(field.matches(ORDER_TYPE_REGEX)) {
+                    orderType = field.startsWith(NEGATIVE_SIGN) ? DESC : ASC;
+                    orderColumn = field.substring(1);
+                } else  {
+                    orderType = ASC;
+                    orderColumn = field;
+                }
+                if(allowedColumns.contains(orderColumn)) {
+                    query.append(i == 0 ? FIND_ALL_QUERY_ORDER_BY_CLAUSE : FIND_ALL_QUERY_ORDER_BY_COLUMN_SEPARATOR);
+                    orderColumn = CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, orderColumn);
+                    query.append(FIND_ALL_QUERY_CERTIFICATE_ALIAS).append(orderColumn).append(SPACE_SIGN).append(orderType.name());
+                }
+            }
+        }
+        return jdbcTemplate.query(query.toString(), new GiftCertificateRowMapper(), params.toArray(Object[]::new));
     }
 
     @Override
