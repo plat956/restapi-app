@@ -12,7 +12,13 @@ public class ExceptionController {
 
     @ExceptionHandler(ResourceNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ResourceError notFound(ResourceNotFoundException e) {
-        return new ResourceError(40401, String.format("Requested resource not found (id = %d)", e.getResourceId()));
+    public ResourceError resourceNotFound(ResourceNotFoundException e) {
+        return new ResourceError(40401, String.format("Requested resource is not found (id = %d)", e.getResourceId()));
+    }
+
+    @ExceptionHandler(Exception.class)
+    @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
+    public ResourceError internalError() {
+        return new ResourceError(500, "Something went wrong. We're working on solving the problem");
     }
 }
