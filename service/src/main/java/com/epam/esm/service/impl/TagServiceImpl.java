@@ -1,8 +1,10 @@
 package com.epam.esm.service.impl;
 
 import com.epam.esm.entity.Tag;
+import com.epam.esm.exception.ServiceException;
 import com.epam.esm.service.TagService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import repository.TagRepository;
 
@@ -30,8 +32,12 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public Tag save(Tag tag) {
-        return tagRepository.save(tag);
+    public Tag save(Tag tag) throws ServiceException {
+        try {
+            return tagRepository.save(tag);
+        } catch (DuplicateKeyException e) {
+            throw new ServiceException("This tag already exists", e);
+        }
     }
 
     @Override

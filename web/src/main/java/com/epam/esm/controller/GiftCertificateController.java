@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -23,7 +24,7 @@ public class GiftCertificateController {
     @GetMapping
     public List<GiftCertificate> getAll(@RequestParam(value = "tag", required = false) String tag,
                                         @RequestParam(value = "search", required = false) String search,
-                                        @RequestParam(value = "sort", required = false) String sort) {
+                                        @RequestParam(value = "sort", required = false)  String sort) {
         return giftCertificateService.findAll(tag, search, sort);
     }
 
@@ -34,12 +35,12 @@ public class GiftCertificateController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public GiftCertificate save(@RequestBody GiftCertificate giftCertificate) {
+    public GiftCertificate save(@RequestBody @Valid GiftCertificate giftCertificate) {
         return giftCertificateService.save(giftCertificate);
     }
 
     @PatchMapping("/{id}")
-    public GiftCertificate update(@PathVariable("id") Long id, @RequestBody GiftCertificate source) {
+    public GiftCertificate update(@PathVariable("id") Long id, @RequestBody @Valid GiftCertificate source) {
         return giftCertificateService.update(id, source);
     }
 

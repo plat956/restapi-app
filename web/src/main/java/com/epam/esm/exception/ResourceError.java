@@ -3,9 +3,9 @@ package com.epam.esm.exception;
 public class ResourceError {
 
     private int errorCode;
-    private String errorMessage;
+    private Object errorMessage;
 
-    public ResourceError(int errorCode, String errorMessage) {
+    public ResourceError(int errorCode, Object errorMessage) {
         this.errorCode = errorCode;
         this.errorMessage = errorMessage;
     }
@@ -14,7 +14,7 @@ public class ResourceError {
         return errorCode;
     }
 
-    public String getErrorMessage() {
+    public Object getErrorMessage() {
         return errorMessage;
     }
 }
