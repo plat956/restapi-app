@@ -23,7 +23,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
-import static repository.impl.IdentityStorage.*;
+import static repository.identity.ColumnName.*;
+import static repository.identity.TableName.CERTIFICATE_TABLE_NAME;
 import static util.OrderType.ASC;
 import static util.OrderType.DESC;
 
@@ -178,7 +179,6 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
         jdbcTemplate.update(DELETE_BY_ID_QUERY, id);
     }
 
-    //todo transactional? find it out
     private void updateTags(GiftCertificate certificate) {
         certificate.getTags().forEach(t -> {
             Optional<Tag> existingTag = tagRepository.findByName(t.getName());

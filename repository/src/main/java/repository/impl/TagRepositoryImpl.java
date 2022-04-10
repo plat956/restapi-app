@@ -13,7 +13,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static repository.impl.IdentityStorage.*;
+import static repository.identity.ColumnName.ENTITY_ID;
+import static repository.identity.ColumnName.TAG_NAME;
+import static repository.identity.TableName.TAG_TABLE_NAME;
 
 @Repository
 public class TagRepositoryImpl implements TagRepository {

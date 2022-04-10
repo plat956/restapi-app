@@ -1,6 +1,7 @@
 package com.epam.esm.service.impl;
 
 import com.epam.esm.entity.GiftCertificate;
+import com.epam.esm.exception.ServiceException;
 import com.epam.esm.service.GiftCertificateService;
 import com.epam.esm.util.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,8 +45,8 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     }
 
     @Override
-    public GiftCertificate update(Long id, GiftCertificate certificate) {
-        GiftCertificate updatedCertificate = findOne(id).get(); //todo not found ex?
+    public GiftCertificate update(Long id, GiftCertificate certificate) throws ServiceException {
+        GiftCertificate updatedCertificate = findOne(id).orElseThrow(ServiceException::new);
         ObjectUtils.merge(certificate, updatedCertificate, "createDate", "lastUpdateDate");
         updatedCertificate.setLastUpdateDate(LocalDateTime.now());
         return giftCertificateRepository.update(updatedCertificate);
