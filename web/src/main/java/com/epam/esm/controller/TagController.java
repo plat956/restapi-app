@@ -12,6 +12,10 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.util.List;
 
+
+/**
+ * The Tag REST API controller.
+ */
 @RestController
 @RequestMapping("/tags")
 public class TagController {
@@ -23,16 +27,33 @@ public class TagController {
         this.tagService = tagService;
     }
 
+    /**
+     * Get all tags.
+     *
+     * @return all available tags
+     */
     @GetMapping
     public List<Tag> getAll() {
         return tagService.findAll();
     }
 
+    /**
+     * Get one tag.
+     *
+     * @param id the tag id
+     * @return found tag, otherwise error response with 40401 status code
+     */
     @GetMapping("/{id}")
     public Tag getOne(@PathVariable("id") Long id) {
         return tagService.findOne(id).orElseThrow(() -> new ResourceNotFoundException(id));
     }
 
+    /**
+     * Save a tag.
+     *
+     * @param tag the tag json object
+     * @return saved tag
+     */
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public Tag save(@RequestBody @Valid Tag tag) {
@@ -43,6 +64,11 @@ public class TagController {
         }
     }
 
+    /**
+     * Delete a tag.
+     *
+     * @param id the tag id
+     */
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable("id") Long id) {

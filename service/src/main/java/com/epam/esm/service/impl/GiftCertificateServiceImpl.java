@@ -33,8 +33,8 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     }
 
     @Override
-    public List<GiftCertificate> findAll(String certificate, String search, String sort) {
-        return giftCertificateRepository.findAll(certificate, search, sort);
+    public List<GiftCertificate> findAll(String tag, String search, String sort) {
+        return giftCertificateRepository.findAll(tag, search, sort);
     }
 
     @Override

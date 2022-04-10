@@ -11,6 +11,9 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.util.List;
 
+/**
+ * The Gift certificate REST API controller.
+ */
 @RestController
 @RequestMapping("/certificates")
 public class GiftCertificateController {
@@ -22,6 +25,16 @@ public class GiftCertificateController {
         this.giftCertificateService = giftCertificateService;
     }
 
+    /**
+     * Get all gift certificates.
+     *
+     * @param tag    the tag name related to a certificate
+     * @param search the part of name/description of a certificate
+     * @param sort   the sequence of fields to sort the result,
+     *               start with ordering type (+ ASC or - DESC) and a field to sort (available fields: createDate, lastUpdateDate, name).
+     *               Eg. -createDate,+name
+     * @return all suitable gift certificates
+     */
     @GetMapping
     public List<GiftCertificate> getAll(@RequestParam(value = "tag", required = false) String tag,
                                         @RequestParam(value = "search", required = false) String search,
@@ -29,17 +42,36 @@ public class GiftCertificateController {
         return giftCertificateService.findAll(tag, search, sort);
     }
 
+    /**
+     * Get one gift certificate.
+     *
+     * @param id the id of gift certificate
+     * @return found gift certificate, otherwise error response with 40401 status code
+     */
     @GetMapping("/{id}")
     public GiftCertificate getOne(@PathVariable("id") Long id) {
         return giftCertificateService.findOne(id).orElseThrow(() -> new ResourceNotFoundException(id));
     }
 
+    /**
+     * Save a gift certificate.
+     *
+     * @param giftCertificate the gift certificate json object
+     * @return the gift certificate saved data
+     */
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public GiftCertificate save(@RequestBody @Valid GiftCertificate giftCertificate) {
         return giftCertificateService.save(giftCertificate);
     }
 
+    /**
+     * Update a gift certificate.
+     *
+     * @param id     the gift certificate id
+     * @param source the json object with only fields to be updated
+     * @return the updated gift certificate
+     */
     @PatchMapping("/{id}")
     public GiftCertificate update(@PathVariable("id") Long id, @RequestBody @Valid GiftCertificate source) {
         try {
@@ -49,6 +81,11 @@ public class GiftCertificateController {
         }
     }
 
+    /**
+     * Delete a gift certificate.
+     *
+     * @param id the gift certificate id
+     */
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable("id") Long id) {
