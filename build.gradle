@@ -1,7 +1,6 @@
 plugins {
-    id 'java'
+    id 'war'
 }
-
 group 'com.epam.esm'
 version '1.0-SNAPSHOT'
 
@@ -20,11 +19,15 @@ allprojects {
         implementation 'org.postgresql:postgresql:42.3.3'
         implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.2.2'
         implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.13.2'
-        implementation 'org.yaml:snakeyaml:1.30'
-        implementation 'com.google.guava:guava:14.0'
         implementation 'javax.validation:validation-api:2.0.1.Final'
         implementation 'org.hibernate:hibernate-validator:6.0.2.Final'
+        implementation 'com.google.guava:guava:14.0'
+        implementation 'org.yaml:snakeyaml:1.30'
     }
+}
+
+dependencies {
+    implementation project(":web")
 }
 
 //test {
