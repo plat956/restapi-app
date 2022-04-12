@@ -1,6 +1,6 @@
 package com.epam.esm.service.impl;
 
-import com.epam.esm.config.profile.DevProfileConfig;
+import com.epam.esm.config.profile.TestProfileConfig;
 import com.epam.esm.entity.Tag;
 import com.epam.esm.exception.ServiceException;
 import com.epam.esm.service.TagService;
@@ -12,7 +12,6 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.context.support.AnnotationConfigContextLoader;
 import repository.TagRepository;
 
 import java.util.Optional;
@@ -22,9 +21,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = DevProfileConfig.class,
-        loader = AnnotationConfigContextLoader.class)
-@ActiveProfiles("dev")
+@ContextConfiguration(classes = TestProfileConfig.class)
+@ActiveProfiles("test")
 public class TagServiceImplTest {
 
     @Autowired

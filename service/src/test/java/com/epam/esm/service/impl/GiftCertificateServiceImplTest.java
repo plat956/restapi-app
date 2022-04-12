@@ -1,6 +1,6 @@
 package com.epam.esm.service.impl;
 
-import com.epam.esm.config.profile.DevProfileConfig;
+import com.epam.esm.config.profile.TestProfileConfig;
 import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.exception.ServiceException;
 import com.epam.esm.service.GiftCertificateService;
@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.context.support.AnnotationConfigContextLoader;
 import repository.GiftCertificateRepository;
 
 import java.math.BigDecimal;
@@ -25,9 +24,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = DevProfileConfig.class,
-        loader = AnnotationConfigContextLoader.class)
-@ActiveProfiles("dev")
+@ContextConfiguration(classes = TestProfileConfig.class)
+@ActiveProfiles("test")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class GiftCertificateServiceImplTest {
 

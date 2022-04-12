@@ -10,6 +10,7 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 
 @Configuration
 @Profile("prod")
+@ComponentScan("com.epam.esm")
 @PropertySource("classpath:database.properties")
 public class ProdProfileConfig {
 
@@ -20,7 +21,7 @@ public class ProdProfileConfig {
         this.env = env;
     }
 
-    @Bean("dataSource")
+    @Bean
     public BasicDataSource dataSource() {
         BasicDataSource ds = new BasicDataSource();
         ds.setDriverClassName(env.getProperty("db.driverClassName"));

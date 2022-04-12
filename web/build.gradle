@@ -11,4 +11,13 @@ repositories {
 
 dependencies {
     implementation project(":service")
+    testImplementation 'org.springframework:spring-test:5.3.18'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.7.2'
+    testImplementation 'com.h2database:h2:2.1.212'
+    testImplementation 'org.hamcrest:hamcrest-library:2.2'
+    testImplementation 'com.jayway.jsonpath:json-path:2.7.0'
+}
+
+test {
+    useJUnitPlatform()
 }
