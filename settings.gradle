@@ -3,3 +3,5 @@ include 'web'
 include 'service'
 include 'model'
 include 'repository'
+include 'log'
+

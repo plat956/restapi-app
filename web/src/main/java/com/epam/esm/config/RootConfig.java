@@ -13,6 +13,7 @@ import javax.sql.DataSource;
 
 @Configuration
 @EnableTransactionManagement
+@EnableAspectJAutoProxy
 @ComponentScan("com.epam.esm")
 public class RootConfig {
 

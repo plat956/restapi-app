@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="INFO">
+    <Properties>
+        <property name="LOG_FOLDER">logs</property>
+        <property name="pattern_cmd">%d{yyyy-MM-dd HH:mm:ss} [%t] %-5level %logger{5} - %m%n</property>
+        <property name="pattern_file">%d{yyyy-MM-dd HH:mm:ss} [%t] [%M] [%L] %-5level %logger{5} - %m%n</property>
+    </Properties>
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="${pattern_cmd}"/>
+        </Console>
+        <RollingFile name="LogFile" fileName="${LOG_FOLDER}/log-${date:yyyy_MM_dd}.log"
+             filePattern="${LOG_FOLDER}/log-%d{yyyy_MM_dd} - %i.log" >
+        <!--<RollingFile name="LogFile" fileName="${sys:catalina.home}/${LOG_FOLDER}/log-${date:yyyy_MM_dd}.log"
+                     filePattern="${LOG_FOLDER}/log-%d{yyyy_MM_dd} - %i.log" >--> <!-- sys:catalina.home should be used for tomcat server deployment -->
+            <PatternLayout pattern="${pattern_file}"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="100 KB" />
+            </Policies>
+        </RollingFile>
+    </Appenders>
+    <Loggers>
+        <Root level="INFO">
+            <AppenderRef ref="Console" />
+            <AppenderRef ref="LogFile"/>
+        </Root>
+    </Loggers>
+</Configuration>

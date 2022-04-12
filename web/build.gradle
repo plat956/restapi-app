@@ -10,7 +10,8 @@ repositories {
 }
 
 dependencies {
-    implementation project(":service")
+    api project(":service")
+    api project(":log")
     testImplementation 'org.springframework:spring-test:5.3.18'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.7.2'
     testImplementation 'com.h2database:h2:2.1.212'
