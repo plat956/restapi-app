@@ -1,6 +1,7 @@
 package repository.identity;
 
 public final class TableName {
+
     private TableName() {
     }
 

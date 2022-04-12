@@ -56,7 +56,6 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
     private static final String FIND_ALL_QUERY_SEARCH_PART = " (gc.name like ? OR gc.description like ?)";
     private static final String FIND_ALL_QUERY_GROUP_BY_TAG_ID_PART = " GROUP BY gc.id";
     private static final String FIND_ALL_QUERY_CERTIFICATE_ALIAS = "gc.";
-
     private static final String ORDER_TYPE_REGEX = "^(\\+|\\-).*$";
     private static final String NEGATIVE_SIGN = "-";
     private static final String COMMA_SIGN = ",";
@@ -117,25 +116,7 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
             query.append(FIND_ALL_QUERY_GROUP_BY_TAG_ID_PART);
         }
         if(sort != null) {
-            List<String> allowedColumns = List.of("name", "createDate", "lastUpdateDate");
-            OrderType orderType;
-            String orderColumn;
-            String[] fields = sort.split(COMMA_SIGN);
-            for(int i = 0; i < fields.length; i++) {
-                String field = fields[i].trim();
-                if(field.matches(ORDER_TYPE_REGEX)) {
-                    orderType = field.startsWith(NEGATIVE_SIGN) ? DESC : ASC;
-                    orderColumn = field.substring(1);
-                } else  {
-                    orderType = ASC;
-                    orderColumn = field;
-                }
-                if(allowedColumns.contains(orderColumn)) {
-                    query.append(i == 0 ? FIND_ALL_QUERY_ORDER_BY_CLAUSE : FIND_ALL_QUERY_ORDER_BY_COLUMN_SEPARATOR);
-                    orderColumn = CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, orderColumn);
-                    query.append(FIND_ALL_QUERY_CERTIFICATE_ALIAS).append(orderColumn).append(SPACE_SIGN).append(orderType.name());
-                }
-            }
+            query.append(buildSortingQueryPart(sort));
         }
         return jdbcTemplate.query(query.toString(), new GiftCertificateRowMapper(), params.toArray(Object[]::new));
     }
@@ -180,6 +161,30 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
         jdbcTemplate.update(DELETE_BY_ID_QUERY, id);
     }
 
+    private StringBuilder buildSortingQueryPart(String sortParameter) {
+        StringBuilder queryPart = new StringBuilder();
+        List<String> allowedColumns = List.of("name", "createDate", "lastUpdateDate");
+        OrderType orderType;
+        String orderColumn;
+        String[] fields = sortParameter.split(COMMA_SIGN);
+        for(int i = 0; i < fields.length; i++) {
+            String field = fields[i].trim();
+            if(field.matches(ORDER_TYPE_REGEX)) {
+                orderType = field.startsWith(NEGATIVE_SIGN) ? DESC : ASC;
+                orderColumn = field.substring(1);
+            } else  {
+                orderType = ASC;
+                orderColumn = field;
+            }
+            if(allowedColumns.contains(orderColumn)) {
+                queryPart.append(i == 0 ? FIND_ALL_QUERY_ORDER_BY_CLAUSE : FIND_ALL_QUERY_ORDER_BY_COLUMN_SEPARATOR);
+                orderColumn = CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, orderColumn);
+                queryPart.append(FIND_ALL_QUERY_CERTIFICATE_ALIAS).append(orderColumn).append(SPACE_SIGN).append(orderType.name());
+            }
+        }
+        return queryPart;
+    }
+
     private void updateTags(GiftCertificate certificate) {
         certificate.getTags().forEach(t -> {
             Optional<Tag> existingTag = tagRepository.findByName(t.getName());
@@ -190,7 +195,8 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
                 tag = tagRepository.save(t);
             }
             t.setId(tag.getId());
-            Integer relationsCount = jdbcTemplate.queryForObject(EXISTS_CERTIFICATE_TAG_RELATIONSHIP_QUERY, Integer.class, certificate.getId(), tag.getId());
+            Integer relationsCount = jdbcTemplate.queryForObject(EXISTS_CERTIFICATE_TAG_RELATIONSHIP_QUERY,
+                    Integer.class, certificate.getId(), tag.getId());
             if(relationsCount == 0) {
                 jdbcTemplate.update(CREATE_CERTIFICATE_TAG_RELATIONSHIP_QUERY, certificate.getId(), tag.getId());
             }

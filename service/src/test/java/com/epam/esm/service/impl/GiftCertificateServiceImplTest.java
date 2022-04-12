@@ -6,6 +6,8 @@ import com.epam.esm.exception.ServiceException;
 import com.epam.esm.service.GiftCertificateService;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ActiveProfiles;
@@ -97,14 +99,15 @@ class GiftCertificateServiceImplTest {
         assertNotNull(spyCertificate.getCreateDate());
     }
 
-    @Test
-    void updateTrue() throws ServiceException {
+    @ParameterizedTest
+    @ValueSource(longs = 3L)
+    void updateTrue(Long id) throws ServiceException {
         GiftCertificate c = new GiftCertificate();
         c.setPrice(BigDecimal.ZERO);
 
         GiftCertificateService spyService = spy(giftCertificateService);
-        spyService.update(3L, c);
-        verify(spyService).findOne(3L);
+        spyService.update(id, c);
+        verify(spyService).findOne(id);
 
         ArgumentCaptor<GiftCertificate> updateArgument = ArgumentCaptor.forClass(GiftCertificate.class);
         verify(giftCertificateRepository).update(updateArgument.capture());
@@ -119,10 +122,11 @@ class GiftCertificateServiceImplTest {
         Assertions.assertThrows(ServiceException.class, () -> giftCertificateService.update(0L, new GiftCertificate()));
     }
 
-    @Test
-    void delete() {
-        giftCertificateService.delete(12L);
-        verify(giftCertificateRepository, times(1)).delete(12L);
+    @ParameterizedTest
+    @ValueSource(longs = 12L)
+    void delete(Long id) {
+        giftCertificateService.delete(id);
+        verify(giftCertificateRepository, times(1)).delete(id);
     }
 
     @AfterAll
