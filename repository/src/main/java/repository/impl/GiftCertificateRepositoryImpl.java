@@ -38,8 +38,9 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
         SELECT gc.id, gc.name, gc.description, gc.price, gc.duration, gc.create_date, gc.last_update_date 
         FROM gift_certificate gc""";
     private static final String CREATE_CERTIFICATE_TAG_RELATIONSHIP_QUERY = """
-        INSERT INTO gift_certificate_tag (gift_certificate_id, tag_id) VALUES (?, ?) 
-        ON CONFLICT DO NOTHING""";
+        INSERT INTO gift_certificate_tag (gift_certificate_id, tag_id) VALUES (?, ?)""";
+    private static final String EXISTS_CERTIFICATE_TAG_RELATIONSHIP_QUERY = """
+        SELECT count(*) FROM gift_certificate_tag WHERE gift_certificate_id = ? AND tag_id = ?""";
     private static final String UPDATE_QUERY = """
         UPDATE gift_certificate 
         SET name = ?, description = ?, price = ?, duration = ?, create_date = ?, last_update_date = ?
@@ -189,7 +190,10 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
                 tag = tagRepository.save(t);
             }
             t.setId(tag.getId());
-            jdbcTemplate.update(CREATE_CERTIFICATE_TAG_RELATIONSHIP_QUERY, certificate.getId(), tag.getId());
+            Integer relationsCount = jdbcTemplate.queryForObject(EXISTS_CERTIFICATE_TAG_RELATIONSHIP_QUERY, Integer.class, certificate.getId(), tag.getId());
+            if(relationsCount == 0) {
+                jdbcTemplate.update(CREATE_CERTIFICATE_TAG_RELATIONSHIP_QUERY, certificate.getId(), tag.getId());
+            }
         });
     }
 

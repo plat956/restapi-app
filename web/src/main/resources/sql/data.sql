@@ -31,4 +31,6 @@ INSERT INTO gift_certificate_tag (gift_certificate_id, tag_id) VALUES (2, 1);
 INSERT INTO gift_certificate_tag (gift_certificate_id, tag_id) VALUES (2, 4);
 INSERT INTO gift_certificate_tag (gift_certificate_id, tag_id) VALUES (2, 5);
 INSERT INTO gift_certificate_tag (gift_certificate_id, tag_id) VALUES (2, 6);
+INSERT INTO gift_certificate_tag (gift_certificate_id, tag_id) VALUES (1, 5);
+INSERT INTO gift_certificate_tag (gift_certificate_id, tag_id) VALUES (3, 5);
 COMMIT;
