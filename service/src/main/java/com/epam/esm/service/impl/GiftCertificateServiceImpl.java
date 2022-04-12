@@ -6,7 +6,7 @@ import com.epam.esm.service.GiftCertificateService;
 import com.epam.esm.util.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import repository.GiftCertificateRepository;
+import com.epam.esm.repository.GiftCertificateRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;

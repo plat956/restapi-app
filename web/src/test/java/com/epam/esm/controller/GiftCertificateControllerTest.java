@@ -1,6 +1,6 @@
 package com.epam.esm.controller;
 
-import com.epam.esm.config.profile.H2TestProfileConfig;
+import com.epam.esm.config.profile.TestProfileConfig;
 import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.entity.Tag;
 import com.epam.esm.exception.ResourceNotFoundException;
@@ -32,8 +32,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = H2TestProfileConfig.class)
-@ActiveProfiles("h2test")
+@ContextConfiguration(classes = TestProfileConfig.class)
+@ActiveProfiles("test")
 @WebAppConfiguration
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class GiftCertificateControllerTest {

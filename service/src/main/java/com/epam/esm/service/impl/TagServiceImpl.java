@@ -6,7 +6,7 @@ import com.epam.esm.service.TagService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
-import repository.TagRepository;
+import com.epam.esm.repository.TagRepository;
 
 import java.util.List;
 import java.util.Optional;

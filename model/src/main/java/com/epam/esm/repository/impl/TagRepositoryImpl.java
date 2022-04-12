@@ -1,21 +1,21 @@
-package repository.impl;
+package com.epam.esm.repository.impl;
 
 import com.epam.esm.entity.Tag;
+import com.epam.esm.repository.TagRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
-import repository.TagRepository;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static repository.identity.ColumnName.ENTITY_ID;
-import static repository.identity.ColumnName.TAG_NAME;
-import static repository.identity.TableName.TAG_TABLE_NAME;
+import static com.epam.esm.repository.identity.ColumnName.ENTITY_ID;
+import static com.epam.esm.repository.identity.ColumnName.TAG_NAME;
+import static com.epam.esm.repository.identity.TableName.TAG_TABLE_NAME;
 
 @Repository
 public class TagRepositoryImpl implements TagRepository {

@@ -1,19 +1,18 @@
 package com.epam.esm.service.impl;
 
-import com.epam.esm.config.profile.TestProfileConfig;
 import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.exception.ServiceException;
+import com.epam.esm.repository.GiftCertificateRepository;
 import com.epam.esm.service.GiftCertificateService;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import repository.GiftCertificateRepository;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -25,22 +24,22 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.*;
 
-@ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = TestProfileConfig.class)
-@ActiveProfiles("test")
+@ExtendWith(MockitoExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class GiftCertificateServiceImplTest {
 
-    @Autowired
+    @Mock
     private GiftCertificateRepository giftCertificateRepository;
 
-    @Autowired
-    private GiftCertificateService giftCertificateService;
+    @InjectMocks
+    private GiftCertificateServiceImpl giftCertificateService;
 
     private List<GiftCertificate> giftCertificates;
 
     @BeforeAll
-    void beforeTestClass() {
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
+
         giftCertificates = new ArrayList<>();
         GiftCertificate c1 = new GiftCertificate();
         c1.setId(1L);
@@ -71,11 +70,17 @@ class GiftCertificateServiceImplTest {
         giftCertificates.add(c1);
         giftCertificates.add(c2);
         giftCertificates.add(c3);
+    }
 
-        when(giftCertificateRepository.findOne(anyLong())).
-                thenAnswer(invocation -> giftCertificates.stream().
-                        filter(u -> u.getId().equals(invocation.getArgument(0))).
-                        findAny());
+    @BeforeEach
+    void setUpEach(TestInfo info) {
+        String method = info.getTestMethod().get().getName();
+        if (!method.equals("save") && !method.equals("delete")) {
+            when(giftCertificateRepository.findOne(anyLong())).
+                    thenAnswer(invocation -> giftCertificates.stream().
+                            filter(u -> u.getId().equals(invocation.getArgument(0))).
+                            findAny());
+        }
     }
 
     @Test
@@ -129,8 +134,8 @@ class GiftCertificateServiceImplTest {
         verify(giftCertificateRepository, times(1)).delete(id);
     }
 
-    @AfterAll
-    public void tearDown() {
-        verify(giftCertificateRepository, atLeast(2)).findOne(anyLong());
-    }
+//    @AfterAll
+//    public void tearDown() {
+//        verify(giftCertificateRepository, atLeast(2)).findOne(anyLong());
+//    }
 }

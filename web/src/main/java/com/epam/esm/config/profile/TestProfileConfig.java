@@ -11,9 +11,9 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import javax.sql.DataSource;
 
 @Configuration
-@Profile("h2test")
+@Profile("test")
 @ComponentScan("com.epam.esm")
-public class H2TestProfileConfig {
+public class TestProfileConfig {
 
     @Bean
     public DataSource dataSource() {

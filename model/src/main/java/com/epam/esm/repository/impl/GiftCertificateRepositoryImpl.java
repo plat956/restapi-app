@@ -1,7 +1,9 @@
-package repository.impl;
+package com.epam.esm.repository.impl;
 
 import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.entity.Tag;
+import com.epam.esm.repository.GiftCertificateRepository;
+import com.epam.esm.repository.TagRepository;
 import com.google.common.base.CaseFormat;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -11,8 +13,6 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-import repository.GiftCertificateRepository;
-import repository.TagRepository;
 import util.OrderType;
 
 import java.sql.ResultSet;
@@ -23,8 +23,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
-import static repository.identity.ColumnName.*;
-import static repository.identity.TableName.CERTIFICATE_TABLE_NAME;
+import static com.epam.esm.repository.identity.ColumnName.*;
+import static com.epam.esm.repository.identity.TableName.CERTIFICATE_TABLE_NAME;
 import static util.OrderType.ASC;
 import static util.OrderType.DESC;
 

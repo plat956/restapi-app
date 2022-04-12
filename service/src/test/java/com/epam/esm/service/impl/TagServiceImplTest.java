@@ -1,18 +1,18 @@
 package com.epam.esm.service.impl;
 
-import com.epam.esm.config.profile.TestProfileConfig;
 import com.epam.esm.entity.Tag;
 import com.epam.esm.exception.ServiceException;
-import com.epam.esm.service.TagService;
+import com.epam.esm.repository.TagRepository;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.DuplicateKeyException;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import repository.TagRepository;
 
 import java.util.Optional;
 
@@ -20,16 +20,20 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-@ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = TestProfileConfig.class)
-@ActiveProfiles("test")
+@ExtendWith(MockitoExtension.class)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class TagServiceImplTest {
 
-    @Autowired
-    private TagService tagService;
-
-    @Autowired
+    @Mock
     private TagRepository tagRepository;
+
+    @InjectMocks
+    private TagServiceImpl tagService;
+
+    @BeforeAll
+    public void setUp() {
+        MockitoAnnotations.openMocks(this);
+    }
 
     @Test
     void findOne() {

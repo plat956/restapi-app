@@ -1,4 +1,4 @@
-package repository.identity;
+package com.epam.esm.repository.identity;
 
 public final class TableName {
 
