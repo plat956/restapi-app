@@ -1,5 +1,7 @@
 package com.epam.esm.config;
 
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.servlet.DispatcherServlet;
 import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
 
 import javax.servlet.ServletContext;
@@ -26,5 +28,12 @@ public class AppInitializer extends AbstractAnnotationConfigDispatcherServletIni
     public void onStartup(ServletContext servletContext) throws ServletException {
         super.onStartup(servletContext);
         servletContext.setInitParameter("spring.profiles.active", "prod");
+    }
+
+    @Override
+    public DispatcherServlet createDispatcherServlet(WebApplicationContext servletAppContext) {
+        DispatcherServlet servlet = (DispatcherServlet) super.createDispatcherServlet(servletAppContext);
+        servlet.setThrowExceptionIfNoHandlerFound(true);
+        return servlet;
     }
 }

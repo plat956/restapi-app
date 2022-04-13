@@ -8,16 +8,23 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.NoHandlerFoundException;
 
 import java.util.List;
 
 @RestControllerAdvice
 public class ExceptionController {
 
+    @ExceptionHandler(NoHandlerFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ResourceError handleNotFoundError() {
+        return new ResourceError(40401, "Requested resource is not found. No appropriate handlers");
+    }
+
     @ExceptionHandler(ResourceNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ResourceError resourceNotFound(ResourceNotFoundException e) {
-        return new ResourceError(40401, String.format("Requested resource is not found (id = %d)", e.getResourceId()));
+        return new ResourceError(40402, String.format("Requested resource is not found (id = %d)", e.getResourceId()));
     }
 
     @ExceptionHandler(ResourceDuplicateException.class)
