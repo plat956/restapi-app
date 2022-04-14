@@ -73,7 +73,7 @@ public class GiftCertificateController {
      * @return the updated gift certificate
      */
     @PatchMapping("/{id}")
-    public GiftCertificate update(@PathVariable("id") Long id, @RequestBody @Valid GiftCertificate source) {
+    public GiftCertificate update(@PathVariable("id") Long id, @RequestBody GiftCertificate source) {
         try {
             return giftCertificateService.update(id, source);
         } catch (ServiceException ex) {
