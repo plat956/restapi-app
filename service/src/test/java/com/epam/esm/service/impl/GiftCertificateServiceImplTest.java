@@ -130,9 +130,4 @@ class GiftCertificateServiceImplTest {
         giftCertificateService.delete(id);
         verify(giftCertificateRepository, times(1)).delete(id);
     }
-
-//    @AfterAll
-//    public void tearDown() {
-//        verify(giftCertificateRepository, atLeast(2)).findOne(anyLong());
-//    }
 }

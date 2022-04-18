@@ -1,6 +1,5 @@
 package com.epam.esm.controller;
 
-import com.epam.esm.config.profile.TestProfileConfig;
 import com.epam.esm.entity.Tag;
 import com.epam.esm.exception.ResourceDuplicateException;
 import com.epam.esm.exception.ResourceNotFoundException;
@@ -9,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.json.AutoConfigureJson;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
@@ -19,10 +19,12 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@SpringBootTest(classes = TestProfileConfig.class)
+@SpringBootTest
+@AutoConfigureJson
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 class TagControllerTest {
+
     @Autowired
     private ObjectMapper objectMapper;
 
