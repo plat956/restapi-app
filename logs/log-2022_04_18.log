@@ -1,0 +1,41 @@
+2022-04-18 22:21:07,477 INFO  [background-preinit] Version: HV000001: Hibernate Validator 6.2.3.Final
+2022-04-18 22:21:07,481 INFO  [main] Application: Starting Application using Java 17.0.1 on DESKTOP-S3BKDRH with PID 7164 (C:\Users\Pavel\IdeaProjects\restapi-app\web\build\classes\java\main started by Pavel in C:\Users\Pavel\IdeaProjects\restapi-app)
+2022-04-18 22:21:07,482 DEBUG [main] Application: Running with Spring Boot v2.6.6, Spring v5.3.18
+2022-04-18 22:21:07,483 INFO  [main] Application: No active profile set, falling back to 1 default profile: "default"
+2022-04-18 22:21:09,060 INFO  [main] TomcatWebServer: Tomcat initialized with port(s): 8080 (http)
+2022-04-18 22:21:09,076 INFO  [main] Http11NioProtocol: Initializing ProtocolHandler ["http-nio-8080"]
+2022-04-18 22:21:09,077 INFO  [main] StandardService: Starting service [Tomcat]
+2022-04-18 22:21:09,077 INFO  [main] StandardEngine: Starting Servlet engine: [Apache Tomcat/9.0.60]
+2022-04-18 22:21:09,186 INFO  [main] [/]: Initializing Spring embedded WebApplicationContext
+2022-04-18 22:21:09,187 INFO  [main] ServletWebServerApplicationContext: Root WebApplicationContext: initialization completed in 1632 ms
+2022-04-18 22:21:09,910 INFO  [main] Http11NioProtocol: Starting ProtocolHandler ["http-nio-8080"]
+2022-04-18 22:21:09,933 INFO  [main] TomcatWebServer: Tomcat started on port(s): 8080 (http) with context path ''
+2022-04-18 22:21:09,947 INFO  [main] Application: Started Application in 2.944 seconds (JVM running for 4.063)
+2022-04-18 23:03:33,545 INFO  [background-preinit] Version: HV000001: Hibernate Validator 6.2.3.Final
+2022-04-18 23:03:33,547 INFO  [main] Application: Starting Application using Java 17.0.1 on DESKTOP-S3BKDRH with PID 17228 (C:\Users\Pavel\IdeaProjects\restapi-app\web\build\classes\java\main started by Pavel in C:\Users\Pavel\IdeaProjects\restapi-app)
+2022-04-18 23:03:33,550 DEBUG [main] Application: Running with Spring Boot v2.6.6, Spring v5.3.18
+2022-04-18 23:03:33,551 INFO  [main] Application: The following 1 profile is active: "prod"
+2022-04-18 23:03:35,235 INFO  [main] TomcatWebServer: Tomcat initialized with port(s): 8080 (http)
+2022-04-18 23:03:35,253 INFO  [main] Http11NioProtocol: Initializing ProtocolHandler ["http-nio-8080"]
+2022-04-18 23:03:35,254 INFO  [main] StandardService: Starting service [Tomcat]
+2022-04-18 23:03:35,254 INFO  [main] StandardEngine: Starting Servlet engine: [Apache Tomcat/9.0.60]
+2022-04-18 23:03:35,369 INFO  [main] [/]: Initializing Spring embedded WebApplicationContext
+2022-04-18 23:03:35,370 INFO  [main] ServletWebServerApplicationContext: Root WebApplicationContext: initialization completed in 1743 ms
+2022-04-18 23:03:36,154 INFO  [main] Http11NioProtocol: Starting ProtocolHandler ["http-nio-8080"]
+2022-04-18 23:03:36,180 INFO  [main] TomcatWebServer: Tomcat started on port(s): 8080 (http) with context path ''
+2022-04-18 23:03:36,196 INFO  [main] Application: Started Application in 3.191 seconds (JVM running for 4.273)
+2022-04-18 23:03:43,687 INFO  [http-nio-8080-exec-1] [/]: Initializing Spring DispatcherServlet 'dispatcherServlet'
+2022-04-18 23:03:43,687 INFO  [http-nio-8080-exec-1] DispatcherServlet: Initializing Servlet 'dispatcherServlet'
+2022-04-18 23:03:43,688 INFO  [http-nio-8080-exec-1] DispatcherServlet: Completed initialization in 0 ms
+2022-04-18 23:03:43,728 DEBUG [http-nio-8080-exec-1] LogAspect: Target class: GiftCertificateController
+2022-04-18 23:03:43,730 DEBUG [http-nio-8080-exec-1] LogAspect: Entering in Method: getAll
+2022-04-18 23:03:43,731 DEBUG [http-nio-8080-exec-1] LogAspect: Arguments: [null, null, null]
+2022-04-18 23:03:43,757 WARN  [http-nio-8080-exec-1] HikariConfig: app-pool - idleTimeout has been set but has no effect because the pool is operating as a fixed size pool.
+2022-04-18 23:03:43,759 INFO  [http-nio-8080-exec-1] HikariDataSource: app-pool - Starting...
+2022-04-18 23:03:43,995 INFO  [http-nio-8080-exec-1] HikariDataSource: app-pool - Start completed.
+2022-04-18 23:03:46,390 WARN  [http-nio-8080-exec-4] PageNotFound: No mapping for GET /
+2022-04-18 23:03:46,393 DEBUG [http-nio-8080-exec-4] LogAspect: Target class: ExceptionController
+2022-04-18 23:03:46,393 DEBUG [http-nio-8080-exec-4] LogAspect: Entering in Method: handleNotFoundError
+2022-04-18 23:03:46,394 DEBUG [http-nio-8080-exec-4] LogAspect: Arguments: []
+2022-04-18 23:03:49,917 INFO  [SpringApplicationShutdownHook] HikariDataSource: app-pool - Shutdown initiated...
+2022-04-18 23:03:49,926 INFO  [SpringApplicationShutdownHook] HikariDataSource: app-pool - Shutdown completed.

@@ -11,7 +11,6 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
@@ -38,8 +37,6 @@ class GiftCertificateServiceImplTest {
 
     @BeforeAll
     void setUp() {
-        MockitoAnnotations.openMocks(this);
-
         giftCertificates = new ArrayList<>();
         GiftCertificate c1 = new GiftCertificate();
         c1.setId(1L);

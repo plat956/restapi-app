@@ -1,10 +1,10 @@
 package com.epam.esm.config.profile;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.*;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 
@@ -24,17 +24,17 @@ public class TestProfileConfig {
                 .build();
     }
 
-    @Bean
-    public JdbcTemplate jdbcTemplate() {
-        return new JdbcTemplate(dataSource());
-    }
-
-    @Bean
-    @Scope(BeanDefinition.SCOPE_PROTOTYPE)
-    public SimpleJdbcInsert simpleJdbcInsert() {
-        return new SimpleJdbcInsert(jdbcTemplate());
-    }
-
+//    @Bean
+//    public JdbcTemplate jdbcTemplate() {
+//        return new JdbcTemplate(dataSource());
+//    }
+//
+//    @Bean
+//    @Scope(BeanDefinition.SCOPE_PROTOTYPE)
+//    public SimpleJdbcInsert simpleJdbcInsert() {
+//        return new SimpleJdbcInsert(jdbcTemplate());
+//    }
+//
     @Bean
     public ObjectMapper objectMapper() {
         return new ObjectMapper();
