@@ -1,4 +1,4 @@
-package util;
+package com.epam.esm.util;
 
 /**
  * The enum represents data ordering types.

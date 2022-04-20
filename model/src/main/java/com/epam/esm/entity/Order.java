@@ -2,6 +2,7 @@ package com.epam.esm.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.NotNull;
@@ -10,6 +11,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Data
+@NoArgsConstructor
 public class Order extends BaseEntity<Long>{
 
     @NotNull(message = "Please provide the certificate")

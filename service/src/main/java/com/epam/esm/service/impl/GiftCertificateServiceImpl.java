@@ -39,6 +39,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
 
     @Override
     public GiftCertificate save(GiftCertificate certificate) {
+        certificate.setId(null);
         certificate.setCreateDate(LocalDateTime.now());
         certificate.setLastUpdateDate(null);
         return giftCertificateRepository.save(certificate);
@@ -47,7 +48,8 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     @Override
     public GiftCertificate update(Long id, GiftCertificate certificate) throws ServiceException {
         GiftCertificate updatedCertificate = findOne(id).orElseThrow(ServiceException::new);
-        ObjectUtils.merge(certificate, updatedCertificate, "createDate", "lastUpdateDate");
+        ObjectUtils.merge(certificate, updatedCertificate, "createDate", "lastUpdateDate", "tags");
+        updatedCertificate.getTags().addAll(certificate.getTags());
         updatedCertificate.setLastUpdateDate(LocalDateTime.now());
         return giftCertificateRepository.update(updatedCertificate);
     }
