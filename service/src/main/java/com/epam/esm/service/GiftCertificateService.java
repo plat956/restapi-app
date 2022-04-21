@@ -36,7 +36,7 @@ public interface GiftCertificateService {
      *                    Eg. -createDate,+name
      * @return the list of suitable gift certificates
      */
-    List<GiftCertificate> findAll(String tag, String search, String sort);
+    List<GiftCertificate> findAll(List<String> tags, String search, List<String> sort);
 
     /**
      * Save a gift certificate.

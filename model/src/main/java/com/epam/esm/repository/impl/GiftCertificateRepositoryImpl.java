@@ -26,7 +26,6 @@ public class GiftCertificateRepositoryImpl extends SessionProvider implements Gi
 
     private static final String ORDER_TYPE_REGEX = "^(\\+|\\-).*$";
     private static final String NEGATIVE_SIGN = "-";
-    private static final String COMMA_SIGN = ",";
     private static final String PERCENT_SIGN = "%";
 
     private TagRepository tagRepository;
@@ -53,7 +52,7 @@ public class GiftCertificateRepositoryImpl extends SessionProvider implements Gi
     }
 
     @Override
-    public List<GiftCertificate> findAll(String tag, String search, String sort) {
+    public List<GiftCertificate> findAll(List<String> tags, String search, List<String> sort) {
         Session session = getSession();
         CriteriaBuilder criteriaBuilder = session.getCriteriaBuilder();
         CriteriaQuery<GiftCertificate> criteriaQuery = criteriaBuilder.createQuery(GiftCertificate.class);
@@ -61,9 +60,8 @@ public class GiftCertificateRepositoryImpl extends SessionProvider implements Gi
 
         criteriaQuery.select(certRoot);
 
-        if (tag != null) {
-            Join<GiftCertificate, Tag> tagJoin = certRoot.join("tags", JoinType.LEFT);
-            criteriaQuery.where(criteriaBuilder.equal(tagJoin.get("name"), tag));
+        if (tags != null && !tags.isEmpty()) {
+            addTagsFiltering(criteriaQuery, criteriaBuilder, certRoot, tags);
         }
 
         if (search != null) {
@@ -75,12 +73,9 @@ public class GiftCertificateRepositoryImpl extends SessionProvider implements Gi
             criteriaQuery.where(searchPredicate);
         }
 
-        if (sort != null) {
-            List<Order> orders = buildCertificatesOrdering(criteriaBuilder, certRoot, sort);
-            criteriaQuery.orderBy(orders);
+        if (sort != null && !sort.isEmpty()) {
+            addCertificatesOrdering(criteriaBuilder, criteriaQuery, certRoot, sort);
         }
-
-        criteriaQuery.distinct(true);
 
         Query<GiftCertificate> query = session.createQuery(criteriaQuery);
         return query.getResultList();
@@ -112,13 +107,12 @@ public class GiftCertificateRepositoryImpl extends SessionProvider implements Gi
         session.delete(certificate);
     }
 
-    private List<Order> buildCertificatesOrdering(CriteriaBuilder criteriaBuilder, Root<GiftCertificate> certRoot, String sortParam) {
+    private void addCertificatesOrdering(CriteriaBuilder cb, CriteriaQuery cq, Root<GiftCertificate> certRoot, List<String> sort) {
         List<Order> orderList = new ArrayList<>();
         List<String> allowedColumns = List.of("name", "createDate", "lastUpdateDate");
         OrderType orderType;
         String orderColumn;
-        String[] fields = sortParam.split(COMMA_SIGN);
-        for (String f: fields) {
+        for (String f: sort) {
             String field = f.trim();
             if (field.matches(ORDER_TYPE_REGEX)) {
                 orderType = field.startsWith(NEGATIVE_SIGN) ? DESC : ASC;
@@ -131,14 +125,33 @@ public class GiftCertificateRepositoryImpl extends SessionProvider implements Gi
                 Order order;
                 Path column = certRoot.get(orderColumn);
                 if (orderType == ASC) {
-                    order = criteriaBuilder.asc(column);
+                    order = cb.asc(column);
                 } else {
-                    order = criteriaBuilder.desc(column);
+                    order = cb.desc(column);
                 }
                 orderList.add(order);
             }
         }
-        return orderList;
+        cq.orderBy(orderList);
+    }
+
+    private void addTagsFiltering(CriteriaQuery cq, CriteriaBuilder cb, Root<GiftCertificate> certRoot, List<String> tags) {
+        Join<GiftCertificate, Tag> tagJoin = certRoot.join("tags", JoinType.LEFT);
+        Predicate[] tagPredicates = new Predicate[tags.size()];
+
+        for(int i = 0; i < tags.size(); i++) {
+            Predicate p = cb.equal(tagJoin.get("name"), tags.get(i));
+            tagPredicates[i] = p;
+        }
+
+        cq.where(cb.or(tagPredicates));
+        cq.groupBy(certRoot.get("id"));
+        cq.having(
+                cb.equal(
+                        cb.count(certRoot.get("id")),
+                        tags.size()
+                )
+        );
     }
 
     private void saveTags(GiftCertificate certificate) {

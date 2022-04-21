@@ -36,10 +36,10 @@ public class GiftCertificateController {
      * @return all suitable gift certificates
      */
     @GetMapping
-    public List<GiftCertificate> getAll(@RequestParam(value = "tag", required = false) String tag,
+    public List<GiftCertificate> getAll(@RequestParam(value = "tags", required = false) List<String> tags,
                                         @RequestParam(value = "search", required = false) String search,
-                                        @RequestParam(value = "sort", required = false)  String sort) {
-        return giftCertificateService.findAll(tag, search, sort);
+                                        @RequestParam(value = "sort", required = false) List<String> sort) {
+        return giftCertificateService.findAll(tags, search, sort);
     }
 
     /**
