@@ -3,10 +3,10 @@ package com.epam.esm.repository.impl;
 import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.entity.Tag;
 import com.epam.esm.repository.GiftCertificateRepository;
+import com.epam.esm.repository.SessionProvider;
 import com.epam.esm.repository.TagRepository;
 import com.epam.esm.util.OrderType;
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -22,20 +22,14 @@ import static com.epam.esm.util.OrderType.ASC;
 import static com.epam.esm.util.OrderType.DESC;
 
 @Repository
-public class GiftCertificateRepositoryImpl implements GiftCertificateRepository {
+public class GiftCertificateRepositoryImpl extends SessionProvider implements GiftCertificateRepository {
 
     private static final String ORDER_TYPE_REGEX = "^(\\+|\\-).*$";
     private static final String NEGATIVE_SIGN = "-";
     private static final String COMMA_SIGN = ",";
     private static final String PERCENT_SIGN = "%";
 
-    private SessionFactory sessionFactory;
     private TagRepository tagRepository;
-
-    @Autowired
-    public GiftCertificateRepositoryImpl(SessionFactory sessionFactory) {
-        this.sessionFactory = sessionFactory;
-    }
 
     @Autowired
     public void setTagRepository(TagRepository tagRepository) {
@@ -156,9 +150,5 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
                 tagRepository.save(t);
             }
         });
-    }
-
-    private Session getSession() {
-        return sessionFactory.getCurrentSession();
     }
 }

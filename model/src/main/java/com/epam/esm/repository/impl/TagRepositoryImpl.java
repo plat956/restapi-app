@@ -1,11 +1,10 @@
 package com.epam.esm.repository.impl;
 
 import com.epam.esm.entity.Tag;
+import com.epam.esm.repository.SessionProvider;
 import com.epam.esm.repository.TagRepository;
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.NoResultException;
@@ -14,18 +13,11 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public class TagRepositoryImpl implements TagRepository {
+public class TagRepositoryImpl extends SessionProvider implements TagRepository {
 
     private static final String FIND_BY_GIFT_CERTIFICATE_ID_QUERY = "SELECT g.tags FROM GiftCertificate g WHERE g.id = :id";
     private static final String FIND_BY_NAME_QUERY = "FROM Tag t WHERE t.name = :name";
     private static final String FIND_ALL_QUERY = "FROM Tag t";
-
-    private SessionFactory sessionFactory;
-
-    @Autowired
-    public TagRepositoryImpl(SessionFactory sessionFactory) {
-        this.sessionFactory = sessionFactory;
-    }
 
     @Override
     public Optional<Tag> findOne(Long id) {
@@ -82,9 +74,5 @@ public class TagRepositoryImpl implements TagRepository {
         } catch (NoResultException ex) {
             return Optional.empty();
         }
-    }
-
-    private Session getSession() {
-        return sessionFactory.getCurrentSession();
     }
 }
