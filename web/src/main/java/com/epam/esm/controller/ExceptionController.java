@@ -4,6 +4,7 @@ import com.epam.esm.exception.ResourceDuplicateException;
 import com.epam.esm.exception.ResourceError;
 import com.epam.esm.exception.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -43,6 +44,12 @@ public class ExceptionController {
                 .map(x -> x.getDefaultMessage())
                 .toList();
         return new ResourceError(40002, errors.size() == 1 ? errors.get(0) : errors);
+    }
+
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResourceError invalidMethod(HttpRequestMethodNotSupportedException ex) {
+        return new ResourceError(40003, ex.getMessage());
     }
 
     @ExceptionHandler(Exception.class)
