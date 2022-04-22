@@ -7,6 +7,7 @@ import com.epam.esm.exception.ServiceException;
 import com.epam.esm.service.OrderService;
 import com.epam.esm.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -68,6 +69,7 @@ public class UserController {
      * @return the created order data
      */
     @PostMapping("/{id}/orders")
+    @ResponseStatus(HttpStatus.CREATED)
     public OrderDto createOrder(@PathVariable("id") Long userId, @RequestBody @Valid OrderDto orderDto) {
         try {
             return orderService.create(userId, orderDto);

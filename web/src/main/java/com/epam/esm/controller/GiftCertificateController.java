@@ -82,6 +82,23 @@ public class GiftCertificateController {
     }
 
     /**
+     * Unbind a tag from a gift certificate.
+     *
+     * @param certId     the gift certificate id
+     * @param tagId     the tag id to be removed
+     * @return the gift certificate without the removed tag
+     */
+    @DeleteMapping("/{certId}/tags/{tagId}")
+    public GiftCertificate unbindTag(@PathVariable("certId") Long certId,
+                                     @PathVariable("tagId") Long tagId) {
+        try {
+            return giftCertificateService.unbindTag(certId, tagId);
+        } catch (ServiceException ex) {
+            throw new ResourceNotFoundException(certId);
+        }
+    }
+
+    /**
      * Delete a gift certificate.
      *
      * @param id the gift certificate id

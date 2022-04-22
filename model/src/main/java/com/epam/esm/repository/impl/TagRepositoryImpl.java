@@ -18,6 +18,7 @@ public class TagRepositoryImpl extends SessionProvider implements TagRepository 
     private static final String FIND_BY_GIFT_CERTIFICATE_ID_QUERY = "SELECT g.tags FROM GiftCertificate g WHERE g.id = :id";
     private static final String FIND_BY_NAME_QUERY = "FROM Tag t WHERE t.name = :name";
     private static final String FIND_ALL_QUERY = "FROM Tag t";
+    private static final String DELETE_BY_ID_QUERY = "DELETE FROM Tag t WHERE t.id = :id";
 
     @Override
     public Optional<Tag> findOne(Long id) {
@@ -50,9 +51,9 @@ public class TagRepositoryImpl extends SessionProvider implements TagRepository 
     @Override
     @Transactional
     public void delete(Long id) {
-        Session session = getSession();
-        Tag tag = session.getReference(Tag.class, id);
-        session.remove(tag);
+        Query<Tag> query = getSession().createQuery(DELETE_BY_ID_QUERY);
+        query.setParameter("id", id);
+        query.executeUpdate();
     }
 
     @Override

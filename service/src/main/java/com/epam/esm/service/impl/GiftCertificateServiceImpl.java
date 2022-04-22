@@ -67,4 +67,11 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     public void delete(Long id) {
         giftCertificateRepository.delete(id);
     }
+
+    @Override
+    public GiftCertificate unbindTag(Long certificateId, Long tagId) throws ServiceException {
+        GiftCertificate certificate = giftCertificateRepository.findOne(certificateId).orElseThrow(ServiceException::new);
+        certificate.getTags().removeIf(t -> t.getId().equals(tagId));
+        return giftCertificateRepository.update(certificate);
+    }
 }

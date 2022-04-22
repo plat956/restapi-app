@@ -62,4 +62,14 @@ public interface GiftCertificateService {
      * @param id the gift certificate id
      */
     void delete(Long id);
+
+    /**
+     * Unbind a tag from a certificate.
+     *
+     * @param certificateId the gift certificate id
+     * @param tagId the tag id to be removed
+     * @return the gift certificate without the removed tag
+     * @throws ServiceException the service exception, if no any gift certificates found with this id
+     */
+    GiftCertificate unbindTag(Long certificateId, Long tagId) throws ServiceException;
 }

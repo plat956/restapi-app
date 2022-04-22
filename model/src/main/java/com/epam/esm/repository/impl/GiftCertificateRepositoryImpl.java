@@ -28,6 +28,7 @@ public class GiftCertificateRepositoryImpl extends SessionProvider implements Gi
     private static final String NEGATIVE_SIGN = "-";
     private static final String PERCENT_SIGN = "%";
     private static final String FIND_BY_ID_IN_QUERY = "FROM GiftCertificate WHERE id in(:ids)";
+    private static final String DELETE_BY_ID_QUERY = "DELETE FROM GiftCertificate t WHERE t.id = :id";
 
     private TagRepository tagRepository;
 
@@ -71,9 +72,9 @@ public class GiftCertificateRepositoryImpl extends SessionProvider implements Gi
     @Override
     @Transactional
     public void delete(Long id) {
-        Session session = getSession();
-        GiftCertificate certificate = session.load(GiftCertificate.class, id);
-        session.delete(certificate);
+        Query<GiftCertificate> query = getSession().createQuery(DELETE_BY_ID_QUERY);
+        query.setParameter("id", id);
+        query.executeUpdate();
     }
 
     @Override
