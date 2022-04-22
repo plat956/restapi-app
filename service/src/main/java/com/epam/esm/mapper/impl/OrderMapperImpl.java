@@ -8,6 +8,7 @@ import com.epam.esm.exception.EntityMappingException;
 import com.epam.esm.mapper.EntityMapper;
 import com.epam.esm.repository.GiftCertificateRepository;
 import com.epam.esm.repository.UserRepository;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -21,11 +22,20 @@ public class OrderMapperImpl implements EntityMapper<OrderDto, Order> {
 
     private UserRepository userRepository;
     private GiftCertificateRepository giftCertificateRepository;
+    private ModelMapper modelMapper;
 
     @Autowired
     public OrderMapperImpl(UserRepository userRepository, GiftCertificateRepository giftCertificateRepository) {
         this.userRepository = userRepository;
         this.giftCertificateRepository = giftCertificateRepository;
+    }
+
+    @Autowired
+    public void setModelMapper(ModelMapper modelMapper) {
+        this.modelMapper = modelMapper;
+        this.modelMapper.typeMap(Order.class, OrderDto.class).addMappings(mapper -> {
+            mapper.skip(OrderDto::setCertificates);
+        });
     }
 
     @Override
@@ -57,15 +67,11 @@ public class OrderMapperImpl implements EntityMapper<OrderDto, Order> {
 
     @Override
     public OrderDto toDto(Order entity) {
-        OrderDto orderDto = new OrderDto();
-        orderDto.setId(entity.getId());
-        orderDto.setUserId(entity.getUser().getId());
+        OrderDto orderDto = modelMapper.map(entity, OrderDto.class);
         List<Long> certificates = entity.getGiftCertificates().stream()
                 .map(GiftCertificate::getId)
                 .toList();
         orderDto.setCertificates(certificates);
-        orderDto.setCost(entity.getCost());
-        orderDto.setPurchaseTimestamp(entity.getPurchaseTimestamp());
         return orderDto;
     }
 }
