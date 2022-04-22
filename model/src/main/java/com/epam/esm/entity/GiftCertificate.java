@@ -14,13 +14,14 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
+@Table(name = "gift_certificates")
 @Data
 @NoArgsConstructor
 public class GiftCertificate extends BaseEntity<Long> {
 
     @Column(nullable = false, length = 80)
     @Size(max = 80, message = "Name must be less than or equal to 80 chars")
-    @NotBlank(message = "Please provide the name")
+    @NotBlank(message = "Please provide a name")
     private String name;
 
     @Column
@@ -30,13 +31,13 @@ public class GiftCertificate extends BaseEntity<Long> {
     @Column(nullable = false)
     @Positive(message = "Price must be positive")
     @DecimalMax(value = "999999.99", message = "Price must be less than a million")
-    @NotNull(message = "Please provide the price")
+    @NotNull(message = "Please provide price")
     private BigDecimal price;
 
     @Column(nullable = false)
     @Positive(message = "Duration must be positive")
     @Max(value = 365, message = "Duration must be less than a year")
-    @NotNull(message = "Please provide the duration")
+    @NotNull(message = "Please provide duration")
     private Integer duration;
 
     @Column(nullable = false)

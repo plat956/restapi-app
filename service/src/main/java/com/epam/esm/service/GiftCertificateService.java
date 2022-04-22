@@ -29,7 +29,7 @@ public interface GiftCertificateService {
     /**
      * Find all gift certificates parametrized.
      *
-     * @param tag the tag name related to a certificate
+     * @param tags the tag name related to a certificate
      * @param search      the part of name/description of a certificate
      * @param sort        the sequence of fields to sort the result,
      *                    start with ordering type (+ ASC or - DESC) and a field to sort (available fields: createDate, lastUpdateDate, name).

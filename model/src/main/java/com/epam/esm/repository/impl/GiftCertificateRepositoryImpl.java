@@ -27,6 +27,7 @@ public class GiftCertificateRepositoryImpl extends SessionProvider implements Gi
     private static final String ORDER_TYPE_REGEX = "^(\\+|\\-).*$";
     private static final String NEGATIVE_SIGN = "-";
     private static final String PERCENT_SIGN = "%";
+    private static final String FIND_BY_ID_IN_QUERY = "FROM GiftCertificate WHERE id in(:ids)";
 
     private TagRepository tagRepository;
 
@@ -52,50 +53,18 @@ public class GiftCertificateRepositoryImpl extends SessionProvider implements Gi
     }
 
     @Override
-    public List<GiftCertificate> findAll(List<String> tags, String search, List<String> sort) {
-        Session session = getSession();
-        CriteriaBuilder criteriaBuilder = session.getCriteriaBuilder();
-        CriteriaQuery<GiftCertificate> criteriaQuery = criteriaBuilder.createQuery(GiftCertificate.class);
-        Root<GiftCertificate> certRoot = criteriaQuery.from(GiftCertificate.class);
-
-        criteriaQuery.select(certRoot);
-
-        if (tags != null && !tags.isEmpty()) {
-            addTagsFiltering(criteriaQuery, criteriaBuilder, certRoot, tags);
-        }
-
-        if (search != null) {
-            search = PERCENT_SIGN + search + PERCENT_SIGN;
-            Predicate searchPredicate = criteriaBuilder.or(
-                    criteriaBuilder.like(certRoot.get("name"), search),
-                    criteriaBuilder.like(certRoot.get("description"), search)
-            );
-            criteriaQuery.where(searchPredicate);
-        }
-
-        if (sort != null && !sort.isEmpty()) {
-            addCertificatesOrdering(criteriaBuilder, criteriaQuery, certRoot, sort);
-        }
-
-        Query<GiftCertificate> query = session.createQuery(criteriaQuery);
-        return query.getResultList();
-    }
-
-    @Override
     @Transactional
     public GiftCertificate save(GiftCertificate certificate) {
-        Session session = getSession();
         saveTags(certificate);
-        session.save(certificate);
+        getSession().save(certificate);
         return certificate;
     }
 
     @Override
     @Transactional
     public GiftCertificate update(GiftCertificate certificate) {
-        Session session = getSession();
         saveTags(certificate);
-        session.update(certificate);
+        getSession().update(certificate);
         return certificate;
     }
 
@@ -107,7 +76,36 @@ public class GiftCertificateRepositoryImpl extends SessionProvider implements Gi
         session.delete(certificate);
     }
 
-    private void addCertificatesOrdering(CriteriaBuilder cb, CriteriaQuery cq, Root<GiftCertificate> certRoot, List<String> sort) {
+    @Override
+    public List<GiftCertificate> findAll(List<String> tags, String search, List<String> sort) {
+        Session session = getSession();
+        CriteriaBuilder criteriaBuilder = session.getCriteriaBuilder();
+        CriteriaQuery<GiftCertificate> criteriaQuery = criteriaBuilder.createQuery(GiftCertificate.class);
+        Root<GiftCertificate> certRoot = criteriaQuery.from(GiftCertificate.class);
+
+        criteriaQuery.select(certRoot);
+
+        if (tags != null && !tags.isEmpty()) {
+            addFilteringByTags(criteriaBuilder, criteriaQuery, certRoot, tags);
+        }
+        if (search != null) {
+            addSearch(criteriaBuilder, criteriaQuery, certRoot, search);
+        }
+        if (sort != null && !sort.isEmpty()) {
+            addOrdering(criteriaBuilder, criteriaQuery, certRoot, sort);
+        }
+        Query<GiftCertificate> query = session.createQuery(criteriaQuery);
+        return query.getResultList();
+    }
+
+    @Override
+    public List<GiftCertificate> findByIdIn(List<Long> ids) {
+        Query<GiftCertificate> query = getSession().createQuery(FIND_BY_ID_IN_QUERY);
+        query.setParameter("ids", ids);
+        return query.getResultList();
+    }
+
+    private void addOrdering(CriteriaBuilder cb, CriteriaQuery cq, Root<GiftCertificate> certRoot, List<String> sort) {
         List<Order> orderList = new ArrayList<>();
         List<String> allowedColumns = List.of("name", "createDate", "lastUpdateDate");
         OrderType orderType;
@@ -122,20 +120,15 @@ public class GiftCertificateRepositoryImpl extends SessionProvider implements Gi
                 orderColumn = field;
             }
             if (allowedColumns.contains(orderColumn)) {
-                Order order;
                 Path column = certRoot.get(orderColumn);
-                if (orderType == ASC) {
-                    order = cb.asc(column);
-                } else {
-                    order = cb.desc(column);
-                }
+                Order order = orderType == ASC ? cb.asc(column) : cb.desc(column);
                 orderList.add(order);
             }
         }
         cq.orderBy(orderList);
     }
 
-    private void addTagsFiltering(CriteriaQuery cq, CriteriaBuilder cb, Root<GiftCertificate> certRoot, List<String> tags) {
+    private void addFilteringByTags(CriteriaBuilder cb, CriteriaQuery cq, Root<GiftCertificate> certRoot, List<String> tags) {
         Join<GiftCertificate, Tag> tagJoin = certRoot.join("tags", JoinType.LEFT);
         Predicate[] tagPredicates = new Predicate[tags.size()];
 
@@ -152,6 +145,15 @@ public class GiftCertificateRepositoryImpl extends SessionProvider implements Gi
                         tags.size()
                 )
         );
+    }
+
+    private void addSearch(CriteriaBuilder cb, CriteriaQuery cq, Root<GiftCertificate> certRoot, String search) {
+        search = PERCENT_SIGN + search + PERCENT_SIGN;
+        Predicate searchPredicate = cb.or(
+                cb.like(certRoot.get("name"), search),
+                cb.like(certRoot.get("description"), search)
+        );
+        cq.where(searchPredicate);
     }
 
     private void saveTags(GiftCertificate certificate) {

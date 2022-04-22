@@ -38,8 +38,8 @@ public class TagRepositoryImpl extends SessionProvider implements TagRepository 
 
     @Override
     public Tag save(Tag entity) {
-        Long id = (Long) getSession().save(entity);
-        return getSession().get(Tag.class, id);
+        getSession().save(entity);
+        return entity;
     }
 
     @Override

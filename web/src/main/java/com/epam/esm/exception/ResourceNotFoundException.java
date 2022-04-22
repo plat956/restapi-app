@@ -8,6 +8,10 @@ public class ResourceNotFoundException extends RuntimeException {
         this.resourceId = resourceId;
     }
 
+    public ResourceNotFoundException(String message) {
+        super(message);
+    }
+
     public Long getResourceId() {
         return resourceId;
     }

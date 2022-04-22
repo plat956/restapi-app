@@ -32,6 +32,4 @@ public class User extends BaseEntity<Long>{
     @JsonIgnore
     @Column(nullable = false)
     private String password;
-
-    //private Set<Order> orders = new HashSet<>();
 }

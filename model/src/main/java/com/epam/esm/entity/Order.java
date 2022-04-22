@@ -1,30 +1,34 @@
 package com.epam.esm.entity;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
-import javax.validation.constraints.DecimalMax;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Positive;
+import javax.persistence.*;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
+@Entity
+@Table(name = "orders")
 @Data
 @NoArgsConstructor
 public class Order extends BaseEntity<Long>{
 
-    @NotNull(message = "Please provide the certificate")
-    private GiftCertificate giftCertificate;
+    @ManyToMany
+    @JoinTable(name = "order_certificate",
+            joinColumns = @JoinColumn(name = "order_id"),
+            inverseJoinColumns = @JoinColumn(name = "gift_certificate_id")
+    )
+    @ToString.Exclude
+    private List<GiftCertificate> giftCertificates = new ArrayList<>();
 
-    @NotNull(message = "Please provide the user")
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     private User user;
 
-    @Positive(message = "Price must be positive")
-    @DecimalMax(value = "999999.99", message = "Price must be less than a million")
-    @NotNull(message = "Please provide the price")
-    private BigDecimal price;
+    @Column(nullable = false)
+    private BigDecimal cost;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    private LocalDateTime purchaseDate;
+    @Column(nullable = false)
+    private Long purchaseTimestamp;
 }

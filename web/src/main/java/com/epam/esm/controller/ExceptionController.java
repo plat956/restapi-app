@@ -25,7 +25,9 @@ public class ExceptionController {
     @ExceptionHandler(ResourceNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ResourceError resourceNotFound(ResourceNotFoundException e) {
-        return new ResourceError(40402, String.format("Requested resource is not found (id = %d)", e.getResourceId()));
+        String message = e.getResourceId() != null ?
+                String.format("Requested resource is not found (id = %d)", e.getResourceId()) : e.getMessage();
+        return new ResourceError(40402, message);
     }
 
     @ExceptionHandler(ResourceDuplicateException.class)
