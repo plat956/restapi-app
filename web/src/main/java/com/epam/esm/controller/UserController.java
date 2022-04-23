@@ -6,6 +6,7 @@ import com.epam.esm.exception.ResourceNotFoundException;
 import com.epam.esm.exception.ServiceException;
 import com.epam.esm.service.OrderService;
 import com.epam.esm.service.UserService;
+import com.epam.esm.util.RequestedPage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -43,11 +44,12 @@ public class UserController {
     /**
      * Get all users.
      *
+     * @param page the requested page
      * @return all available users
      */
     @GetMapping
-    public List<User> getAllUsers() {
-        return userService.findAll();
+    public List<User> getAllUsers(RequestedPage page) {
+        return userService.findAllPaginated(page);
     }
 
     /**
@@ -57,8 +59,8 @@ public class UserController {
      * @return the all available user orders
      */
     @GetMapping("/{id}/orders")
-    public List<OrderDto> getAllOrders(@PathVariable("id") Long userId) {
-        return orderService.findByUserId(userId);
+    public List<OrderDto> getAllOrders(@PathVariable("id") Long userId, RequestedPage page) {
+        return orderService.findByUserIdPaginated(userId, page);
     }
 
     /**

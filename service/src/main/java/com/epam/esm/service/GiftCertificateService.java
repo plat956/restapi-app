@@ -2,6 +2,7 @@ package com.epam.esm.service;
 
 import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.exception.ServiceException;
+import com.epam.esm.util.RequestedPage;
 
 import java.util.List;
 import java.util.Optional;
@@ -22,9 +23,10 @@ public interface GiftCertificateService {
     /**
      * Find all gift certificates.
      *
+     * @param page the requested page
      * @return the list of gift certificates or empty one
      */
-    List<GiftCertificate> findAll();
+    List<GiftCertificate> findAllPaginated(RequestedPage page);
 
     /**
      * Find all gift certificates parametrized.
@@ -34,9 +36,10 @@ public interface GiftCertificateService {
      * @param sort        the sequence of fields to sort the result,
      *                    start with ordering type (+ ASC or - DESC) and a field to sort (available fields: createDate, lastUpdateDate, name).
      *                    Eg. -createDate,+name
+     * @param page the requested page
      * @return the list of suitable gift certificates
      */
-    List<GiftCertificate> findAll(List<String> tags, String search, List<String> sort);
+    List<GiftCertificate> findAllPaginated(List<String> tags, String search, List<String> sort, RequestedPage page);
 
     /**
      * Save a gift certificate.

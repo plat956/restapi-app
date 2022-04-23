@@ -7,6 +7,7 @@ import com.epam.esm.exception.ServiceException;
 import com.epam.esm.mapper.EntityMapper;
 import com.epam.esm.repository.OrderRepository;
 import com.epam.esm.service.OrderService;
+import com.epam.esm.util.RequestedPage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -36,8 +37,8 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public List<OrderDto> findByUserId(Long id) {
-        List<Order> orders = orderRepository.findByUserId(id);
+    public List<OrderDto> findByUserIdPaginated(Long id, RequestedPage page) {
+        List<Order> orders = orderRepository.findByUserIdPaginated(id, page);
         return orders.stream().map(orderMapper::toDto).toList();
     }
 

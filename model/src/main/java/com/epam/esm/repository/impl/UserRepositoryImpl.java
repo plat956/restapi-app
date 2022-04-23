@@ -3,6 +3,7 @@ package com.epam.esm.repository.impl;
 import com.epam.esm.entity.User;
 import com.epam.esm.repository.SessionProvider;
 import com.epam.esm.repository.UserRepository;
+import com.epam.esm.util.RequestedPage;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
 import org.springframework.stereotype.Repository;
@@ -28,9 +29,11 @@ public class UserRepositoryImpl extends SessionProvider implements UserRepositor
     }
 
     @Override
-    public List<User> findAll() {
+    public List<User> findAllPaginated(RequestedPage page) {
         Session session = getSession();
         Query<User> query = session.createQuery(FIND_ALL_QUERY);
+        query.setFirstResult(page.getOffset());
+        query.setMaxResults(page.getLimit());
         return query.getResultList();
     }
 

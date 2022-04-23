@@ -4,6 +4,7 @@ import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.exception.ResourceNotFoundException;
 import com.epam.esm.exception.ServiceException;
 import com.epam.esm.service.GiftCertificateService;
+import com.epam.esm.util.RequestedPage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -33,13 +34,15 @@ public class GiftCertificateController {
      * @param sort   the sequence of fields to sort the result,
      *               start with ordering type (+ ASC or - DESC) and a field to sort (available fields: createDate, lastUpdateDate, name).
      *               Eg. -createDate,+name
+     * @param page the requested page
      * @return all suitable gift certificates
      */
     @GetMapping
     public List<GiftCertificate> getAll(@RequestParam(value = "tags", required = false) List<String> tags,
                                         @RequestParam(value = "search", required = false) String search,
-                                        @RequestParam(value = "sort", required = false) List<String> sort) {
-        return giftCertificateService.findAll(tags, search, sort);
+                                        @RequestParam(value = "sort", required = false) List<String> sort,
+                                        RequestedPage page) {
+        return giftCertificateService.findAllPaginated(tags, search, sort, page);
     }
 
     /**

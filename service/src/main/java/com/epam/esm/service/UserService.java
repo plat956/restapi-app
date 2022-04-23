@@ -1,6 +1,7 @@
 package com.epam.esm.service;
 
 import com.epam.esm.entity.User;
+import com.epam.esm.util.RequestedPage;
 
 import java.util.List;
 import java.util.Optional;
@@ -21,7 +22,8 @@ public interface UserService {
     /**
      * Find all users.
      *
+     * @param page the requested page
      * @return the list of users or empty one
      */
-    List<User> findAll();
+    List<User> findAllPaginated(RequestedPage page);
 }

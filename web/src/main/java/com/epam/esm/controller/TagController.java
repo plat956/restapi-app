@@ -5,6 +5,7 @@ import com.epam.esm.exception.ResourceDuplicateException;
 import com.epam.esm.exception.ResourceNotFoundException;
 import com.epam.esm.exception.ServiceException;
 import com.epam.esm.service.TagService;
+import com.epam.esm.util.RequestedPage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -30,11 +31,12 @@ public class TagController {
     /**
      * Get all tags.
      *
+     * @param page the requested page
      * @return all available tags
      */
     @GetMapping
-    public List<Tag> getAll() {
-        return tagService.findAll();
+    public List<Tag> getAll(RequestedPage page) {
+        return tagService.findAllPaginated(page);
     }
 
     /**

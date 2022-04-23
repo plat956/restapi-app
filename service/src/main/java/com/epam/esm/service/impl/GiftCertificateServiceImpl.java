@@ -4,6 +4,7 @@ import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.exception.ServiceException;
 import com.epam.esm.repository.GiftCertificateRepository;
 import com.epam.esm.service.GiftCertificateService;
+import com.epam.esm.util.RequestedPage;
 import org.modelmapper.Conditions;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,13 +38,13 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     }
 
     @Override
-    public List<GiftCertificate> findAll() {
-        return giftCertificateRepository.findAll();
+    public List<GiftCertificate> findAllPaginated(RequestedPage page) {
+        return giftCertificateRepository.findAllPaginated(page);
     }
 
     @Override
-    public List<GiftCertificate> findAll(List<String> tags, String search, List<String> sort) {
-        return giftCertificateRepository.findAll(tags, search, sort);
+    public List<GiftCertificate> findAllPaginated(List<String> tags, String search, List<String> sort, RequestedPage page) {
+        return giftCertificateRepository.findAllPaginated(tags, search, sort, page);
     }
 
     @Override

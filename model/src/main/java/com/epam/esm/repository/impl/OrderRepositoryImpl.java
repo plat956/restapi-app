@@ -3,6 +3,7 @@ package com.epam.esm.repository.impl;
 import com.epam.esm.entity.Order;
 import com.epam.esm.repository.OrderRepository;
 import com.epam.esm.repository.SessionProvider;
+import com.epam.esm.util.RequestedPage;
 import org.hibernate.query.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,8 +28,8 @@ public class OrderRepositoryImpl extends SessionProvider implements OrderReposit
     }
 
     @Override
-    public List<Order> findAll() {
-        return null;
+    public List<Order> findAllPaginated(RequestedPage page) {
+        throw new UnsupportedOperationException("FindAllPaginated method of an Order entity is not supported");
     }
 
     @Override
@@ -49,9 +50,11 @@ public class OrderRepositoryImpl extends SessionProvider implements OrderReposit
     }
 
     @Override
-    public List<Order> findByUserId(Long id) {
+    public List<Order> findByUserIdPaginated(Long id, RequestedPage page) {
         Query<Order> query = getSession().createQuery(FIND_BY_USER_ID_QUERY);
         query.setParameter("id", id);
+        query.setFirstResult(page.getOffset());
+        query.setMaxResults(page.getLimit());
         return query.getResultList();
     }
 }

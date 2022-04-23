@@ -14,8 +14,8 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Component
 public class OrderMapperImpl implements EntityMapper<OrderDto, Order> {
@@ -43,15 +43,12 @@ public class OrderMapperImpl implements EntityMapper<OrderDto, Order> {
         User user = userRepository.findOne(dto.getUserId())
                 .orElseThrow(() -> new EntityMappingException(String.format("User with id = %d not found", dto.getUserId())));
 
-        List<GiftCertificate> certificates = giftCertificateRepository.findByIdIn(dto.getCertificates());
-        List<Long> certificateIds = certificates.stream().map(GiftCertificate::getId).toList();
+        List<GiftCertificate> certificates = new ArrayList<>(dto.getCertificates().size());
 
-        dto.getCertificates().removeAll(certificateIds);
-
-        if(!dto.getCertificates().isEmpty()) {
-            String idSequence = dto.getCertificates().stream().map(Object::toString)
-                    .collect(Collectors.joining(", "));
-            throw new EntityMappingException("Failed to find gift certificates: " + idSequence);
+        for(Long certId: dto.getCertificates()) {
+            GiftCertificate certificate = giftCertificateRepository.findOne(certId)
+                    .orElseThrow(() -> new EntityMappingException("Failed to find a gift certificate: " + certId));
+            certificates.add(certificate);
         }
 
         BigDecimal cost = certificates.stream().map(GiftCertificate::getPrice)

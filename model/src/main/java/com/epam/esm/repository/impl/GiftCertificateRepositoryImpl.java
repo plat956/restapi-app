@@ -6,6 +6,7 @@ import com.epam.esm.repository.GiftCertificateRepository;
 import com.epam.esm.repository.SessionProvider;
 import com.epam.esm.repository.TagRepository;
 import com.epam.esm.util.OrderType;
+import com.epam.esm.util.RequestedPage;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +28,6 @@ public class GiftCertificateRepositoryImpl extends SessionProvider implements Gi
     private static final String ORDER_TYPE_REGEX = "^(\\+|\\-).*$";
     private static final String NEGATIVE_SIGN = "-";
     private static final String PERCENT_SIGN = "%";
-    private static final String FIND_BY_ID_IN_QUERY = "FROM GiftCertificate WHERE id in(:ids)";
     private static final String DELETE_BY_ID_QUERY = "DELETE FROM GiftCertificate t WHERE t.id = :id";
 
     private TagRepository tagRepository;
@@ -48,7 +48,7 @@ public class GiftCertificateRepositoryImpl extends SessionProvider implements Gi
     }
 
     @Override
-    public List<GiftCertificate> findAll() {
+    public List<GiftCertificate> findAllPaginated(RequestedPage page) {
         Query query = getSession().createQuery("FROM GiftCertificate g");
         return query.getResultList();
     }
@@ -78,7 +78,7 @@ public class GiftCertificateRepositoryImpl extends SessionProvider implements Gi
     }
 
     @Override
-    public List<GiftCertificate> findAll(List<String> tags, String search, List<String> sort) {
+    public List<GiftCertificate> findAllPaginated(List<String> tags, String search, List<String> sort, RequestedPage page) {
         Session session = getSession();
         CriteriaBuilder criteriaBuilder = session.getCriteriaBuilder();
         CriteriaQuery<GiftCertificate> criteriaQuery = criteriaBuilder.createQuery(GiftCertificate.class);
@@ -96,13 +96,8 @@ public class GiftCertificateRepositoryImpl extends SessionProvider implements Gi
             addOrdering(criteriaBuilder, criteriaQuery, certRoot, sort);
         }
         Query<GiftCertificate> query = session.createQuery(criteriaQuery);
-        return query.getResultList();
-    }
-
-    @Override
-    public List<GiftCertificate> findByIdIn(List<Long> ids) {
-        Query<GiftCertificate> query = getSession().createQuery(FIND_BY_ID_IN_QUERY);
-        query.setParameter("ids", ids);
+        query.setFirstResult(page.getOffset());
+        query.setMaxResults(page.getLimit());
         return query.getResultList();
     }
 
