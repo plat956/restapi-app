@@ -3,6 +3,7 @@ package com.epam.esm.entity;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.springframework.hateoas.server.core.Relation;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -13,6 +14,7 @@ import java.util.List;
 @Table(name = "orders")
 @Data
 @NoArgsConstructor
+@Relation(collectionRelation = "orders")
 public class Order extends BaseEntity<Long>{
 
     @ManyToMany

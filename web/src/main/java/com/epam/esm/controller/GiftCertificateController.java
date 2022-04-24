@@ -1,11 +1,14 @@
 package com.epam.esm.controller;
 
+import com.epam.esm.assembler.GiftCertificateModelAssembler;
 import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.exception.ResourceNotFoundException;
 import com.epam.esm.exception.ServiceException;
 import com.epam.esm.service.GiftCertificateService;
 import com.epam.esm.util.RequestedPage;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,10 +23,16 @@ import java.util.List;
 public class GiftCertificateController {
 
     private GiftCertificateService giftCertificateService;
+    private GiftCertificateModelAssembler certificateModelAssembler;
 
     @Autowired
     public GiftCertificateController(GiftCertificateService giftCertificateService) {
         this.giftCertificateService = giftCertificateService;
+    }
+
+    @Autowired
+    public void setCertificateModelAssembler(GiftCertificateModelAssembler certificateModelAssembler) {
+        this.certificateModelAssembler = certificateModelAssembler;
     }
 
     /**
@@ -38,11 +47,12 @@ public class GiftCertificateController {
      * @return all suitable gift certificates
      */
     @GetMapping
-    public List<GiftCertificate> getAll(@RequestParam(value = "tags", required = false) List<String> tags,
-                                        @RequestParam(value = "search", required = false) String search,
-                                        @RequestParam(value = "sort", required = false) List<String> sort,
-                                        RequestedPage page) {
-        return giftCertificateService.findAllPaginated(tags, search, sort, page);
+    public CollectionModel<EntityModel<GiftCertificate>> getAll(@RequestParam(value = "tags", required = false) List<String> tags,
+                                                                @RequestParam(value = "search", required = false) String search,
+                                                                @RequestParam(value = "sort", required = false) List<String> sort,
+                                                                RequestedPage page) {
+        List<GiftCertificate> certificates = giftCertificateService.findAllPaginated(tags, search, sort, page);
+        return certificateModelAssembler.toCollectionModel(certificates);
     }
 
     /**
@@ -52,8 +62,10 @@ public class GiftCertificateController {
      * @return found gift certificate, otherwise error response with 40401 status code
      */
     @GetMapping("/{id}")
-    public GiftCertificate getOne(@PathVariable("id") Long id) {
-        return giftCertificateService.findOne(id).orElseThrow(() -> new ResourceNotFoundException(id));
+    public EntityModel<GiftCertificate> getOne(@PathVariable("id") Long id) {
+        GiftCertificate certificate = giftCertificateService.findOne(id)
+                .orElseThrow(() -> new ResourceNotFoundException(id));
+        return certificateModelAssembler.toModelWithAllLink(certificate);
     }
 
     /**
@@ -64,8 +76,9 @@ public class GiftCertificateController {
      */
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public GiftCertificate save(@RequestBody @Valid GiftCertificate giftCertificate) {
-        return giftCertificateService.save(giftCertificate);
+    public EntityModel<GiftCertificate> save(@RequestBody @Valid GiftCertificate giftCertificate) {
+        GiftCertificate certificate = giftCertificateService.save(giftCertificate);
+        return certificateModelAssembler.toModelWithAllLink(certificate);
     }
 
     /**
@@ -76,9 +89,11 @@ public class GiftCertificateController {
      * @return the updated gift certificate
      */
     @PatchMapping("/{id}")
-    public GiftCertificate update(@PathVariable("id") Long id, @RequestBody GiftCertificate source) {
+    public EntityModel<GiftCertificate> update(@PathVariable("id") Long id,
+                                               @RequestBody GiftCertificate source) {
         try {
-            return giftCertificateService.update(id, source);
+            GiftCertificate certificate = giftCertificateService.update(id, source);
+            return certificateModelAssembler.toModelWithAllLink(certificate);
         } catch (ServiceException ex) {
             throw new ResourceNotFoundException(id);
         }
@@ -92,10 +107,11 @@ public class GiftCertificateController {
      * @return the gift certificate without the removed tag
      */
     @DeleteMapping("/{certId}/tags/{tagId}")
-    public GiftCertificate unbindTag(@PathVariable("certId") Long certId,
-                                     @PathVariable("tagId") Long tagId) {
+    public EntityModel<GiftCertificate> unbindTag(@PathVariable("certId") Long certId,
+                                                  @PathVariable("tagId") Long tagId) {
         try {
-            return giftCertificateService.unbindTag(certId, tagId);
+            GiftCertificate certificate = giftCertificateService.unbindTag(certId, tagId);
+            return certificateModelAssembler.toModelWithAllLink(certificate);
         } catch (ServiceException ex) {
             throw new ResourceNotFoundException(certId);
         }

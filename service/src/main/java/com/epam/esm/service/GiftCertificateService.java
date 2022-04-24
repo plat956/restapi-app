@@ -75,4 +75,14 @@ public interface GiftCertificateService {
      * @throws ServiceException the service exception, if no any gift certificates found with this id
      */
     GiftCertificate unbindTag(Long certificateId, Long tagId) throws ServiceException;
+
+
+    /**
+     * Find gift certificates by order id.
+     *
+     * @param id   the gift certificate id
+     * @param page the requested page
+     * @return the list of found certificates
+     */
+    List<GiftCertificate> findByOrderIdPaginated(Long id, RequestedPage page);
 }

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.springframework.hateoas.server.core.Relation;
 
 import javax.persistence.*;
 import javax.validation.Valid;
@@ -17,6 +18,7 @@ import java.util.Set;
 @Table(name = "gift_certificates")
 @Data
 @NoArgsConstructor
+@Relation(collectionRelation = "certificates")
 public class GiftCertificate extends BaseEntity<Long> {
 
     @Column(nullable = false, length = 80)

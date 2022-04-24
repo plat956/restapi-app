@@ -1,5 +1,7 @@
 package com.epam.esm.controller;
 
+import com.epam.esm.assembler.OrderDtoModelAssembler;
+import com.epam.esm.assembler.UserModelAssembler;
 import com.epam.esm.dto.OrderDto;
 import com.epam.esm.entity.User;
 import com.epam.esm.exception.ResourceNotFoundException;
@@ -8,6 +10,8 @@ import com.epam.esm.service.OrderService;
 import com.epam.esm.service.UserService;
 import com.epam.esm.util.RequestedPage;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,11 +27,23 @@ public class UserController {
 
     private UserService userService;
     private OrderService orderService;
+    private UserModelAssembler userModelAssembler;
+    private OrderDtoModelAssembler orderDtoModelAssembler;
 
     @Autowired
     public UserController(UserService userService, OrderService orderService) {
         this.userService = userService;
         this.orderService = orderService;
+    }
+
+    @Autowired
+    public void setUserModelAssembler(UserModelAssembler userModelAssembler) {
+        this.userModelAssembler = userModelAssembler;
+    }
+
+    @Autowired
+    public void setOrderDtoModelAssembler(OrderDtoModelAssembler orderDtoModelAssembler) {
+        this.orderDtoModelAssembler = orderDtoModelAssembler;
     }
 
     /**
@@ -37,8 +53,9 @@ public class UserController {
      * @return found user, otherwise error response with 40401 status code
      */
     @GetMapping("/{id}")
-    public User getOneUser(@PathVariable("id") Long id) {
-        return userService.findOne(id).orElseThrow(() -> new ResourceNotFoundException(id));
+    public EntityModel<User> getOneUser(@PathVariable("id") Long id) {
+        User user = userService.findOne(id).orElseThrow(() -> new ResourceNotFoundException(id));
+        return userModelAssembler.toModelWithAllLink(user);
     }
 
     /**
@@ -48,8 +65,9 @@ public class UserController {
      * @return all available users
      */
     @GetMapping
-    public List<User> getAllUsers(RequestedPage page) {
-        return userService.findAllPaginated(page);
+    public CollectionModel<EntityModel<User>> getAllUsers(RequestedPage page) {
+        List<User> users = userService.findAllPaginated(page);
+        return userModelAssembler.toCollectionModel(users);
     }
 
     /**
@@ -59,8 +77,9 @@ public class UserController {
      * @return the all available user orders
      */
     @GetMapping("/{id}/orders")
-    public List<OrderDto> getAllOrders(@PathVariable("id") Long userId, RequestedPage page) {
-        return orderService.findByUserIdPaginated(userId, page);
+    public CollectionModel<EntityModel<OrderDto>> getAllOrders(@PathVariable("id") Long userId, RequestedPage page) {
+        List<OrderDto> orders = orderService.findByUserIdPaginated(userId, page);
+        return orderDtoModelAssembler.toCollectionModel(orders, userId);
     }
 
     /**
@@ -72,9 +91,10 @@ public class UserController {
      */
     @PostMapping("/{id}/orders")
     @ResponseStatus(HttpStatus.CREATED)
-    public OrderDto createOrder(@PathVariable("id") Long userId, @RequestBody @Valid OrderDto orderDto) {
+    public EntityModel<OrderDto> createOrder(@PathVariable("id") Long userId, @RequestBody @Valid OrderDto orderDto) {
         try {
-            return orderService.create(userId, orderDto);
+            OrderDto o = orderService.create(userId, orderDto);
+            return orderDtoModelAssembler.toModelWithAllLink(o);
         } catch (ServiceException ex) {
             throw new ResourceNotFoundException(ex.getMessage());
         }

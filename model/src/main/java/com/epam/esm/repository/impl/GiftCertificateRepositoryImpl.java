@@ -29,6 +29,8 @@ public class GiftCertificateRepositoryImpl extends SessionProvider implements Gi
     private static final String NEGATIVE_SIGN = "-";
     private static final String PERCENT_SIGN = "%";
     private static final String DELETE_BY_ID_QUERY = "DELETE FROM GiftCertificate t WHERE t.id = :id";
+    private static final String FIND_ALL_QUERY = "FROM GiftCertificate g";
+    private static final String FIND_BY_ORDER_ID = "SELECT o.giftCertificates FROM Order o WHERE o.id = :id";
 
     private TagRepository tagRepository;
 
@@ -49,7 +51,7 @@ public class GiftCertificateRepositoryImpl extends SessionProvider implements Gi
 
     @Override
     public List<GiftCertificate> findAllPaginated(RequestedPage page) {
-        Query query = getSession().createQuery("FROM GiftCertificate g");
+        Query query = getSession().createQuery(FIND_ALL_QUERY);
         return query.getResultList();
     }
 
@@ -96,6 +98,15 @@ public class GiftCertificateRepositoryImpl extends SessionProvider implements Gi
             addOrdering(criteriaBuilder, criteriaQuery, certRoot, sort);
         }
         Query<GiftCertificate> query = session.createQuery(criteriaQuery);
+        query.setFirstResult(page.getOffset());
+        query.setMaxResults(page.getLimit());
+        return query.getResultList();
+    }
+
+    @Override
+    public List<GiftCertificate> findByOrderIdPaginated(Long id, RequestedPage page) {
+        Query query = getSession().createQuery(FIND_BY_ORDER_ID);
+        query.setParameter("id", id);
         query.setFirstResult(page.getOffset());
         query.setMaxResults(page.getLimit());
         return query.getResultList();

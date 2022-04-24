@@ -2,6 +2,7 @@ package com.epam.esm.entity;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.hateoas.server.core.Relation;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -13,6 +14,7 @@ import javax.validation.constraints.Size;
 @Table(name = "tags")
 @Data
 @NoArgsConstructor
+@Relation(collectionRelation = "tags")
 public class Tag extends BaseEntity<Long> {
 
     @Column(nullable = false, unique = true, length = 20)

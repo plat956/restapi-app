@@ -75,4 +75,9 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
         certificate.getTags().removeIf(t -> t.getId().equals(tagId));
         return giftCertificateRepository.update(certificate);
     }
+
+    @Override
+    public List<GiftCertificate> findByOrderIdPaginated(Long id, RequestedPage page) {
+        return giftCertificateRepository.findByOrderIdPaginated(id, page);
+    }
 }

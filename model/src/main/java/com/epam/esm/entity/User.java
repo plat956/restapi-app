@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.hateoas.server.core.Relation;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -14,6 +15,7 @@ import java.time.LocalDate;
 @Table(name = "users")
 @Data
 @NoArgsConstructor
+@Relation(collectionRelation = "users")
 public class User extends BaseEntity<Long>{
 
     @Column(nullable = false)

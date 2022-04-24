@@ -9,4 +9,5 @@ public interface GiftCertificateRepository extends BaseRepository<Long, GiftCert
 
     List<GiftCertificate> findAllPaginated(List<String> tags, String search,
                                            List<String> sort, RequestedPage page);
+    List<GiftCertificate> findByOrderIdPaginated(Long id, RequestedPage page);
 }
