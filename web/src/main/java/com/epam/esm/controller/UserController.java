@@ -12,11 +12,11 @@ import com.epam.esm.util.RequestedPage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.List;
 
 /**
  * The User REST API controller.
@@ -62,11 +62,13 @@ public class UserController {
      * Get all users.
      *
      * @param page the requested page
+     * @param limit the requested records per page limit
      * @return all available users
      */
     @GetMapping
-    public CollectionModel<EntityModel<User>> getAllUsers(RequestedPage page) {
-        List<User> users = userService.findAllPaginated(page);
+    public CollectionModel<EntityModel<User>> getAllUsers(@RequestParam(value = "page", required = false) Long page,
+                                                          @RequestParam(value = "limit", required = false) Long limit) {
+        PagedModel<User> users = userService.findAllPaginated(new RequestedPage(page, limit));
         return userModelAssembler.toCollectionModel(users);
     }
 
@@ -74,11 +76,15 @@ public class UserController {
      * Get all user orders.
      *
      * @param userId the user id
+     * @param page the requested page
+     * @param limit the requested records per page limit
      * @return the all available user orders
      */
     @GetMapping("/{id}/orders")
-    public CollectionModel<EntityModel<OrderDto>> getAllOrders(@PathVariable("id") Long userId, RequestedPage page) {
-        List<OrderDto> orders = orderService.findByUserIdPaginated(userId, page);
+    public CollectionModel<EntityModel<OrderDto>> getAllOrders(@PathVariable("id") Long userId,
+                                                               @RequestParam(value = "page", required = false) Long page,
+                                                               @RequestParam(value = "limit", required = false) Long limit) {
+        PagedModel<OrderDto> orders = orderService.findByUserIdPaginated(userId, new RequestedPage(page, limit));
         return orderDtoModelAssembler.toCollectionModel(orders, userId);
     }
 

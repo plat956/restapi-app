@@ -5,9 +5,9 @@ import com.epam.esm.repository.UserRepository;
 import com.epam.esm.service.UserService;
 import com.epam.esm.util.RequestedPage;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -26,7 +26,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<User> findAllPaginated(RequestedPage page) {
+    public PagedModel<User> findAllPaginated(RequestedPage page) {
         return userRepository.findAllPaginated(page);
     }
 }

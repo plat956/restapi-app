@@ -5,6 +5,7 @@ import com.epam.esm.repository.OrderRepository;
 import com.epam.esm.repository.SessionProvider;
 import com.epam.esm.util.RequestedPage;
 import org.hibernate.query.Query;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,6 +17,7 @@ import java.util.Optional;
 public class OrderRepositoryImpl extends SessionProvider implements OrderRepository {
 
     private static final String FIND_BY_USER_ID_QUERY  = "FROM Order o WHERE o.user.id = :id";
+    private static final String COUNT_BY_USER_ID_QUERY  = "SELECT count(o) FROM Order o WHERE o.user.id = :id";
 
     @Override
     public Optional<Order> findOne(Long id) {
@@ -28,7 +30,7 @@ public class OrderRepositoryImpl extends SessionProvider implements OrderReposit
     }
 
     @Override
-    public List<Order> findAllPaginated(RequestedPage page) {
+    public PagedModel<Order> findAllPaginated(RequestedPage page) {
         throw new UnsupportedOperationException("FindAllPaginated method of an Order entity is not supported");
     }
 
@@ -50,11 +52,18 @@ public class OrderRepositoryImpl extends SessionProvider implements OrderReposit
     }
 
     @Override
-    public List<Order> findByUserIdPaginated(Long id, RequestedPage page) {
+    public PagedModel<Order> findByUserIdPaginated(Long id, RequestedPage page) {
         Query<Order> query = getSession().createQuery(FIND_BY_USER_ID_QUERY);
         query.setParameter("id", id);
-        query.setFirstResult(page.getOffset());
-        query.setMaxResults(page.getLimit());
-        return query.getResultList();
+        query.setFirstResult(page.getOffset().intValue());
+        query.setMaxResults(page.getLimit().intValue());
+        List<Order> orders = query.getResultList();
+
+        Query<Long> countQuery = getSession().createQuery(COUNT_BY_USER_ID_QUERY);
+        countQuery.setParameter("id", id);
+        Long totalRecords = countQuery.getSingleResult();
+
+        PagedModel.PageMetadata metadata = new PagedModel.PageMetadata(page.getLimit(), page.getPage(), totalRecords);
+        return PagedModel.of(orders, metadata);
     }
 }

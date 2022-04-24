@@ -3,8 +3,8 @@ package com.epam.esm.service;
 import com.epam.esm.dto.OrderDto;
 import com.epam.esm.exception.ServiceException;
 import com.epam.esm.util.RequestedPage;
+import org.springframework.hateoas.PagedModel;
 
-import java.util.List;
 import java.util.Optional;
 
 /**
@@ -25,9 +25,9 @@ public interface OrderService {
      *
      * @param id the user id
      * @param page the requested page
-     * @return the list of orders or empty one
+     * @return the paged model with a list of orders or empty one
      */
-    List<OrderDto> findByUserIdPaginated(Long id, RequestedPage page);
+    PagedModel<OrderDto> findByUserIdPaginated(Long id, RequestedPage page);
 
     /**
      * Create an order.

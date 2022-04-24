@@ -9,6 +9,7 @@ import com.epam.esm.repository.OrderRepository;
 import com.epam.esm.service.OrderService;
 import com.epam.esm.util.RequestedPage;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -37,9 +38,10 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public List<OrderDto> findByUserIdPaginated(Long id, RequestedPage page) {
-        List<Order> orders = orderRepository.findByUserIdPaginated(id, page);
-        return orders.stream().map(orderMapper::toDto).toList();
+    public PagedModel<OrderDto> findByUserIdPaginated(Long id, RequestedPage page) {
+        PagedModel<Order> orders = orderRepository.findByUserIdPaginated(id, page);
+        List<OrderDto> orderDtos = orders.getContent().stream().map(orderMapper::toDto).toList();
+        return PagedModel.of(orderDtos, orders.getMetadata());
     }
 
     @Override

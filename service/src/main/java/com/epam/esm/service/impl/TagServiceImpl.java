@@ -7,9 +7,9 @@ import com.epam.esm.service.TagService;
 import com.epam.esm.util.RequestedPage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -28,7 +28,7 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public List<Tag> findAllPaginated(RequestedPage page) {
+    public PagedModel<Tag> findAllPaginated(RequestedPage page) {
         return tagRepository.findAllPaginated(page);
     }
 

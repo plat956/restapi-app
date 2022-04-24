@@ -11,12 +11,8 @@ import com.epam.esm.util.RequestedPage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
+import org.springframework.hateoas.PagedModel;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * The Order REST API controller.
@@ -63,12 +59,15 @@ public class OrderController {
      *
      * @param id the order id
      * @param page the requested page
+     * @param limit the requested records per page limit
      * @return found order certificates, otherwise empty list
      */
     @GetMapping("/{id}/certificates")
     public CollectionModel<EntityModel<GiftCertificate>> getOrderCertificates(
-            @PathVariable("id") Long id, RequestedPage page) {
-        List<GiftCertificate> certificates = certificateService.findByOrderIdPaginated(id, page);
+            @PathVariable("id") Long id,
+            @RequestParam(value = "page", required = false) Long page,
+            @RequestParam(value = "limit", required = false) Long limit) {
+        PagedModel<GiftCertificate> certificates = certificateService.findByOrderIdPaginated(id, new RequestedPage(page, limit));
         return certificateModelAssembler.toCollectionModel(certificates, id);
     }
 }

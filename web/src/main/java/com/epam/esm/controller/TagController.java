@@ -10,11 +10,11 @@ import com.epam.esm.util.RequestedPage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.List;
 
 
 /**
@@ -37,11 +37,13 @@ public class TagController {
      * Get all tags.
      *
      * @param page the requested page
+     * @param limit the requested records per page limit
      * @return all available tags
      */
     @GetMapping
-    public CollectionModel<EntityModel<Tag>> getAll(RequestedPage page) {
-        List<Tag> tags = tagService.findAllPaginated(page);
+    public CollectionModel<EntityModel<Tag>> getAll(@RequestParam(value = "page", required = false) Long page,
+                                                    @RequestParam(value = "limit", required = false) Long limit) {
+        PagedModel<Tag> tags = tagService.findAllPaginated(new RequestedPage(page, limit));
         return tagModelAssembler.toCollectionModel(tags);
     }
 

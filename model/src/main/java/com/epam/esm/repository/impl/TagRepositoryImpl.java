@@ -6,6 +6,7 @@ import com.epam.esm.repository.TagRepository;
 import com.epam.esm.util.RequestedPage;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.NoResultException;
@@ -19,6 +20,7 @@ public class TagRepositoryImpl extends SessionProvider implements TagRepository 
     private static final String FIND_BY_GIFT_CERTIFICATE_ID_QUERY = "SELECT g.tags FROM GiftCertificate g WHERE g.id = :id";
     private static final String FIND_BY_NAME_QUERY = "FROM Tag t WHERE t.name = :name";
     private static final String FIND_ALL_QUERY = "FROM Tag t";
+    private static final String COUNT_ALL_QUERY = "SELECT count(t) FROM Tag t";
     private static final String DELETE_BY_ID_QUERY = "DELETE FROM Tag t WHERE t.id = :id";
 
     @Override
@@ -32,12 +34,18 @@ public class TagRepositoryImpl extends SessionProvider implements TagRepository 
     }
 
     @Override
-    public List<Tag> findAllPaginated(RequestedPage page) {
+    public PagedModel<Tag> findAllPaginated(RequestedPage page) {
         Session session = getSession();
         Query<Tag> query = session.createQuery(FIND_ALL_QUERY);
-        query.setFirstResult(page.getOffset());
-        query.setMaxResults(page.getLimit());
-        return query.getResultList();
+        query.setFirstResult(page.getOffset().intValue());
+        query.setMaxResults(page.getLimit().intValue());
+        List<Tag> tags = query.getResultList();
+
+        Query<Long> countQuery = getSession().createQuery(COUNT_ALL_QUERY);
+        Long totalRecords = countQuery.getSingleResult();
+
+        PagedModel.PageMetadata metadata = new PagedModel.PageMetadata(page.getLimit(), page.getPage(), totalRecords);
+        return PagedModel.of(tags, metadata);
     }
 
     @Override

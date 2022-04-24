@@ -5,23 +5,23 @@ package com.epam.esm.util;
  */
 public final class RequestedPage {
 
-    private static final Integer DEF_PAGE = 1;
-    private static final Integer DEF_LIMIT = 10;
+    private static final Long DEFAULT_PAGE = 1L;
+    private static final Long DEFAULT_LIMIT = 10L;
 
-    private final Integer page;
-    private final Integer limit;
-    private final Integer offset;
+    private final Long page;
+    private final Long limit;
+    private final Long offset;
 
     /**
      * Instantiates a new Request page.
-     * Calculates limit and offset values to make sql data selection
+     * Calculates limit and offset values to make database data selection
      *
      * @param page the page parameter.
      * @param limit the data per page limit parameter.
      */
-    public RequestedPage(Integer page, Integer limit) {
-        this.page = page != null ? page : DEF_PAGE;
-        this.limit = limit != null ? limit : DEF_LIMIT;
+    public RequestedPage(Long page, Long limit) {
+        this.page = page != null && page > 0L ? page : DEFAULT_PAGE;
+        this.limit = limit != null ? limit : DEFAULT_LIMIT;
         this.offset = (this.page - 1) * this.limit;
     }
 
@@ -30,7 +30,7 @@ public final class RequestedPage {
      *
      * @return the page
      */
-    public int getPage() {
+    public Long getPage() {
         return page;
     }
 
@@ -39,7 +39,7 @@ public final class RequestedPage {
      *
      * @return the limit
      */
-    public int getLimit() {
+    public Long getLimit() {
         return limit;
     }
 
@@ -48,7 +48,7 @@ public final class RequestedPage {
      *
      * @return the offset
      */
-    public int getOffset() {
+    public Long getOffset() {
         return offset;
     }
 }

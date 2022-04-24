@@ -8,6 +8,7 @@ import com.epam.esm.util.RequestedPage;
 import org.modelmapper.Conditions;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -38,12 +39,12 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     }
 
     @Override
-    public List<GiftCertificate> findAllPaginated(RequestedPage page) {
+    public PagedModel<GiftCertificate> findAllPaginated(RequestedPage page) {
         return giftCertificateRepository.findAllPaginated(page);
     }
 
     @Override
-    public List<GiftCertificate> findAllPaginated(List<String> tags, String search, List<String> sort, RequestedPage page) {
+    public PagedModel<GiftCertificate> findAllPaginated(List<String> tags, String search, List<String> sort, RequestedPage page) {
         return giftCertificateRepository.findAllPaginated(tags, search, sort, page);
     }
 
@@ -77,7 +78,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     }
 
     @Override
-    public List<GiftCertificate> findByOrderIdPaginated(Long id, RequestedPage page) {
+    public PagedModel<GiftCertificate> findByOrderIdPaginated(Long id, RequestedPage page) {
         return giftCertificateRepository.findByOrderIdPaginated(id, page);
     }
 }

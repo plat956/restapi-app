@@ -3,6 +3,7 @@ package com.epam.esm.service;
 import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.exception.ServiceException;
 import com.epam.esm.util.RequestedPage;
+import org.springframework.hateoas.PagedModel;
 
 import java.util.List;
 import java.util.Optional;
@@ -24,9 +25,9 @@ public interface GiftCertificateService {
      * Find all gift certificates.
      *
      * @param page the requested page
-     * @return the list of gift certificates or empty one
+     * @return the paged model with a list of gift certificates or empty one
      */
-    List<GiftCertificate> findAllPaginated(RequestedPage page);
+    PagedModel<GiftCertificate> findAllPaginated(RequestedPage page);
 
     /**
      * Find all gift certificates parametrized.
@@ -37,9 +38,9 @@ public interface GiftCertificateService {
      *                    start with ordering type (+ ASC or - DESC) and a field to sort (available fields: createDate, lastUpdateDate, name).
      *                    Eg. -createDate,+name
      * @param page the requested page
-     * @return the list of suitable gift certificates
+     * @return the paged model with a list of suitable gift certificates
      */
-    List<GiftCertificate> findAllPaginated(List<String> tags, String search, List<String> sort, RequestedPage page);
+    PagedModel<GiftCertificate> findAllPaginated(List<String> tags, String search, List<String> sort, RequestedPage page);
 
     /**
      * Save a gift certificate.
@@ -82,7 +83,7 @@ public interface GiftCertificateService {
      *
      * @param id   the gift certificate id
      * @param page the requested page
-     * @return the list of found certificates
+     * @return the paged model with a list of found certificates
      */
-    List<GiftCertificate> findByOrderIdPaginated(Long id, RequestedPage page);
+    PagedModel<GiftCertificate> findByOrderIdPaginated(Long id, RequestedPage page);
 }

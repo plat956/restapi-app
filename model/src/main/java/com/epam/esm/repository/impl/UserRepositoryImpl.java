@@ -6,6 +6,7 @@ import com.epam.esm.repository.UserRepository;
 import com.epam.esm.util.RequestedPage;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.NoResultException;
@@ -16,6 +17,7 @@ import java.util.Optional;
 public class UserRepositoryImpl extends SessionProvider implements UserRepository {
 
     private static final String FIND_ALL_QUERY = "FROM User u";
+    private static final String COUNT_ALL_QUERY = "SELECT count(u) FROM User u";
 
     @Override
     public Optional<User> findOne(Long id) {
@@ -29,12 +31,18 @@ public class UserRepositoryImpl extends SessionProvider implements UserRepositor
     }
 
     @Override
-    public List<User> findAllPaginated(RequestedPage page) {
+    public PagedModel<User> findAllPaginated(RequestedPage page) {
         Session session = getSession();
         Query<User> query = session.createQuery(FIND_ALL_QUERY);
-        query.setFirstResult(page.getOffset());
-        query.setMaxResults(page.getLimit());
-        return query.getResultList();
+        query.setFirstResult(page.getOffset().intValue());
+        query.setMaxResults(page.getLimit().intValue());
+        List<User> users = query.getResultList();
+
+        Query<Long> countQuery = getSession().createQuery(COUNT_ALL_QUERY);
+        Long totalRecords = countQuery.getSingleResult();
+
+        PagedModel.PageMetadata metadata = new PagedModel.PageMetadata(page.getLimit(), page.getPage(), totalRecords);
+        return PagedModel.of(users, metadata);
     }
 
     @Override

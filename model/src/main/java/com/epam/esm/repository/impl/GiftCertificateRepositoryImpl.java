@@ -10,6 +10,7 @@ import com.epam.esm.util.RequestedPage;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,7 +31,9 @@ public class GiftCertificateRepositoryImpl extends SessionProvider implements Gi
     private static final String PERCENT_SIGN = "%";
     private static final String DELETE_BY_ID_QUERY = "DELETE FROM GiftCertificate t WHERE t.id = :id";
     private static final String FIND_ALL_QUERY = "FROM GiftCertificate g";
+    private static final String COUNT_ALL_QUERY = "SELECT count(g) FROM GiftCertificate g";
     private static final String FIND_BY_ORDER_ID = "SELECT o.giftCertificates FROM Order o WHERE o.id = :id";
+    private static final String COUNT_BY_ORDER_ID = "SELECT count(c.id) FROM Order o INNER JOIN o.giftCertificates c where o.id = :id";
 
     private TagRepository tagRepository;
 
@@ -50,9 +53,15 @@ public class GiftCertificateRepositoryImpl extends SessionProvider implements Gi
     }
 
     @Override
-    public List<GiftCertificate> findAllPaginated(RequestedPage page) {
+    public PagedModel<GiftCertificate> findAllPaginated(RequestedPage page) {
         Query query = getSession().createQuery(FIND_ALL_QUERY);
-        return query.getResultList();
+        List<GiftCertificate> certificates = query.getResultList();
+
+        Query<Long> countQuery = getSession().createQuery(COUNT_ALL_QUERY);
+        Long totalRecords = countQuery.getSingleResult();
+
+        PagedModel.PageMetadata metadata = new PagedModel.PageMetadata(page.getLimit(), page.getPage(), totalRecords);
+        return PagedModel.of(certificates, metadata);
     }
 
     @Override
@@ -80,7 +89,7 @@ public class GiftCertificateRepositoryImpl extends SessionProvider implements Gi
     }
 
     @Override
-    public List<GiftCertificate> findAllPaginated(List<String> tags, String search, List<String> sort, RequestedPage page) {
+    public PagedModel<GiftCertificate> findAllPaginated(List<String> tags, String search, List<String> sort, RequestedPage page) {
         Session session = getSession();
         CriteriaBuilder criteriaBuilder = session.getCriteriaBuilder();
         CriteriaQuery<GiftCertificate> criteriaQuery = criteriaBuilder.createQuery(GiftCertificate.class);
@@ -88,28 +97,63 @@ public class GiftCertificateRepositoryImpl extends SessionProvider implements Gi
 
         criteriaQuery.select(certRoot);
 
-        if (tags != null && !tags.isEmpty()) {
-            addFilteringByTags(criteriaBuilder, criteriaQuery, certRoot, tags);
-        }
-        if (search != null) {
-            addSearch(criteriaBuilder, criteriaQuery, certRoot, search);
-        }
-        if (sort != null && !sort.isEmpty()) {
-            addOrdering(criteriaBuilder, criteriaQuery, certRoot, sort);
-        }
+        fillFindAllQueryWithParams(tags, search, sort, criteriaBuilder, criteriaQuery, certRoot);
+
         Query<GiftCertificate> query = session.createQuery(criteriaQuery);
-        query.setFirstResult(page.getOffset());
-        query.setMaxResults(page.getLimit());
-        return query.getResultList();
+        query.setFirstResult(page.getOffset().intValue());
+        query.setMaxResults(page.getLimit().intValue());
+
+        List<GiftCertificate> certificates = query.getResultList();
+        Long totalRecords = getTotalRecords(tags, search, sort);
+
+        PagedModel.PageMetadata metadata = new PagedModel.PageMetadata(page.getLimit(), page.getPage(), totalRecords);
+        return PagedModel.of(certificates, metadata);
     }
 
     @Override
-    public List<GiftCertificate> findByOrderIdPaginated(Long id, RequestedPage page) {
-        Query query = getSession().createQuery(FIND_BY_ORDER_ID);
+    public PagedModel<GiftCertificate> findByOrderIdPaginated(Long id, RequestedPage page) {
+        Query<GiftCertificate> query = getSession().createQuery(FIND_BY_ORDER_ID);
         query.setParameter("id", id);
-        query.setFirstResult(page.getOffset());
-        query.setMaxResults(page.getLimit());
-        return query.getResultList();
+        query.setFirstResult(page.getOffset().intValue());
+        query.setMaxResults(page.getLimit().intValue());
+        List<GiftCertificate> certificates = query.getResultList();
+
+        Query<Long> countQuery = getSession().createQuery(COUNT_BY_ORDER_ID);
+        countQuery.setParameter("id", id);
+        Long totalRecords = countQuery.getSingleResult();
+
+        PagedModel.PageMetadata metadata = new PagedModel.PageMetadata(page.getLimit(), page.getPage(), totalRecords);
+        return PagedModel.of(certificates, metadata);
+    }
+
+    private Long getTotalRecords(List<String> tags, String search, List<String> sort) {
+        Session session = getSession();
+        CriteriaBuilder cb = session.getCriteriaBuilder();
+
+        CriteriaQuery<Long> cq = cb.createQuery(Long.class);
+        Root<GiftCertificate> cr = cq.from(GiftCertificate.class);
+        cq.select(cb.count(cr));
+
+        fillFindAllQueryWithParams(tags, search, sort, cb, cq, cr);
+        cq.orderBy(List.of());
+        try {
+            return session.createQuery(cq).getSingleResult();
+        } catch (NoResultException ex) {
+            return 0L;
+        }
+    }
+
+    private void fillFindAllQueryWithParams(List<String> tags, String search, List<String> sort,
+                           CriteriaBuilder cb, CriteriaQuery cq, Root certRoot) {
+        if (tags != null && !tags.isEmpty()) {
+            addFilteringByTags(cb, cq, certRoot, tags);
+        }
+        if (search != null) {
+            addSearch(cb, cq, certRoot, search);
+        }
+        if (sort != null && !sort.isEmpty()) {
+            addOrdering(cb, cq, certRoot, sort);
+        }
     }
 
     private void addOrdering(CriteriaBuilder cb, CriteriaQuery cq, Root<GiftCertificate> certRoot, List<String> sort) {
