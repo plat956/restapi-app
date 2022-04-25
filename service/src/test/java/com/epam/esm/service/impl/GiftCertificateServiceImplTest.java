@@ -1,6 +1,7 @@
 package com.epam.esm.service.impl;
 
 import com.epam.esm.entity.GiftCertificate;
+import com.epam.esm.entity.Tag;
 import com.epam.esm.exception.ServiceException;
 import com.epam.esm.repository.GiftCertificateRepository;
 import com.epam.esm.service.GiftCertificateService;
@@ -11,7 +12,9 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.modelmapper.ModelMapper;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -19,8 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -29,6 +31,9 @@ class GiftCertificateServiceImplTest {
 
     @Mock
     private GiftCertificateRepository giftCertificateRepository;
+
+    @Spy
+    private ModelMapper modelMapper;
 
     @InjectMocks
     private GiftCertificateServiceImpl giftCertificateService;
@@ -63,6 +68,11 @@ class GiftCertificateServiceImplTest {
         c3.setLastUpdateDate(LocalDateTime.now());
         c3.setDuration(4);
         c3.setPrice(BigDecimal.valueOf(20.13));
+
+        Tag tag = new Tag();
+        tag.setId(1L);
+        tag.setName("test tag");
+        c3.getTags().add(tag);
 
         giftCertificates.add(c1);
         giftCertificates.add(c2);
@@ -129,5 +139,18 @@ class GiftCertificateServiceImplTest {
     void delete(Long id) {
         giftCertificateService.delete(id);
         verify(giftCertificateRepository, times(1)).delete(id);
+    }
+
+    @ParameterizedTest
+    @ValueSource(longs = 3L)
+    void unbindTag(Long id) throws ServiceException {
+        GiftCertificate certificate = giftCertificateService.findOne(id).get();
+
+        giftCertificateService.unbindTag(id, 1L);
+
+        verify(giftCertificateRepository, times(2)).findOne(id);
+        verify(giftCertificateRepository).update(any(GiftCertificate.class));
+
+        assertTrue(certificate.getTags().isEmpty());
     }
 }

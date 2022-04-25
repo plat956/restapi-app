@@ -145,12 +145,17 @@ public class GiftCertificateRepositoryImpl extends SessionProvider implements Gi
 
     private void fillFindAllQueryWithParams(List<String> tags, String search, List<String> sort,
                            CriteriaBuilder cb, CriteriaQuery cq, Root certRoot) {
+        List<Predicate> wherePredicates = new ArrayList<>();
+
         if (tags != null && !tags.isEmpty()) {
-            addFilteringByTags(cb, cq, certRoot, tags);
+            addFilteringByTags(cb, cq, certRoot, tags, wherePredicates);
         }
         if (search != null) {
-            addSearch(cb, cq, certRoot, search);
+            addSearch(cb, cq, certRoot, search, wherePredicates);
         }
+
+        cq.where(wherePredicates.toArray(Predicate[]::new));
+
         if (sort != null && !sort.isEmpty()) {
             addOrdering(cb, cq, certRoot, sort);
         }
@@ -179,7 +184,8 @@ public class GiftCertificateRepositoryImpl extends SessionProvider implements Gi
         cq.orderBy(orderList);
     }
 
-    private void addFilteringByTags(CriteriaBuilder cb, CriteriaQuery cq, Root<GiftCertificate> certRoot, List<String> tags) {
+    private void addFilteringByTags(CriteriaBuilder cb, CriteriaQuery cq, Root<GiftCertificate> certRoot,
+                                    List<String> tags, List<Predicate> wherePredicates) {
         Join<GiftCertificate, Tag> tagJoin = certRoot.join("tags", JoinType.LEFT);
         Predicate[] tagPredicates = new Predicate[tags.size()];
 
@@ -188,7 +194,8 @@ public class GiftCertificateRepositoryImpl extends SessionProvider implements Gi
             tagPredicates[i] = p;
         }
 
-        cq.where(cb.or(tagPredicates));
+        wherePredicates.add(cb.or(tagPredicates));
+
         cq.groupBy(certRoot.get("id"));
         cq.having(
                 cb.equal(
@@ -198,13 +205,14 @@ public class GiftCertificateRepositoryImpl extends SessionProvider implements Gi
         );
     }
 
-    private void addSearch(CriteriaBuilder cb, CriteriaQuery cq, Root<GiftCertificate> certRoot, String search) {
+    private void addSearch(CriteriaBuilder cb, CriteriaQuery cq, Root<GiftCertificate> certRoot,
+                           String search, List<Predicate> wherePredicates) {
         search = PERCENT_SIGN + search + PERCENT_SIGN;
         Predicate searchPredicate = cb.or(
                 cb.like(certRoot.get("name"), search),
                 cb.like(certRoot.get("description"), search)
         );
-        cq.where(searchPredicate);
+        wherePredicates.add(searchPredicate);
     }
 
     private void saveTags(GiftCertificate certificate) {

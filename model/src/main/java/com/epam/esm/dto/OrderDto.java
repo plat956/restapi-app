@@ -5,7 +5,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.hateoas.RepresentationModel;
 import org.springframework.hateoas.server.core.Relation;
 
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotEmpty;
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -16,7 +16,7 @@ public class OrderDto extends RepresentationModel<OrderDto> {
 
     private Long id;
 
-    @NotNull(message = "Please provide gift certificate ids")
+    @NotEmpty(message = "Please provide gift certificate ids")
     private List<Long> certificates;
 
     private Long userId;
