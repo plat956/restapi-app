@@ -8,6 +8,7 @@ import java.util.List;
 
 public interface PagedModelAssembler<T> {
 
+    String SELFT_NODE = "self";
     String FIRST_PAGE_NODE = "first";
     String PREV_PAGE_NODE = "prev";
     String NEXT_PAGE_NODE = "next";

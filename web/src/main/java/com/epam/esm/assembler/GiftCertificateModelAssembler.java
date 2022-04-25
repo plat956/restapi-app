@@ -19,15 +19,21 @@ public class GiftCertificateModelAssembler implements PagedModelAssembler<GiftCe
 
     @Override
     public void addLinks(EntityModel<GiftCertificate> resource) {
+        if(resource.hasLink(SELFT_NODE)) {
+            return;
+        }
         Link selfLink = linkTo(methodOn(GiftCertificateController.class)
                 .getOne(resource.getContent().getId()))
                 .withSelfRel();
         resource.add(selfLink);
         resource.getContent().getTags()
-                .forEach(t ->
+                .forEach(t -> {
+                    if(!t.hasLink(SELFT_NODE)) {
                         t.add(linkTo(methodOn(TagController.class)
                                 .getOne(t.getId()))
-                                .withSelfRel()));
+                                .withSelfRel());
+                    }
+                });
     }
 
     public EntityModel<GiftCertificate> toModelWithAllLink(GiftCertificate entity) {
