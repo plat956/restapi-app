@@ -151,7 +151,7 @@ public class GiftCertificateRepositoryImpl extends SessionProvider implements Gi
             addFilteringByTags(cb, cq, certRoot, tags, wherePredicates);
         }
         if (search != null) {
-            addSearch(cb, cq, certRoot, search, wherePredicates);
+            addSearch(cb, certRoot, search, wherePredicates);
         }
 
         cq.where(wherePredicates.toArray(Predicate[]::new));
@@ -205,12 +205,12 @@ public class GiftCertificateRepositoryImpl extends SessionProvider implements Gi
         );
     }
 
-    private void addSearch(CriteriaBuilder cb, CriteriaQuery cq, Root<GiftCertificate> certRoot,
+    private void addSearch(CriteriaBuilder cb, Root<GiftCertificate> certRoot,
                            String search, List<Predicate> wherePredicates) {
-        search = PERCENT_SIGN + search + PERCENT_SIGN;
+        search = PERCENT_SIGN + search.toLowerCase() + PERCENT_SIGN;
         Predicate searchPredicate = cb.or(
-                cb.like(certRoot.get("name"), search),
-                cb.like(certRoot.get("description"), search)
+                cb.like(cb.lower(certRoot.get("name")), search),
+                cb.like(cb.lower(certRoot.get("description")), search)
         );
         wherePredicates.add(searchPredicate);
     }
