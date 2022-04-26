@@ -8,6 +8,7 @@ import com.epam.esm.exception.EntityMappingException;
 import com.epam.esm.mapper.EntityMapper;
 import com.epam.esm.repository.GiftCertificateRepository;
 import com.epam.esm.repository.UserRepository;
+import com.epam.esm.util.MessageProvider;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -23,6 +24,7 @@ public class OrderMapperImpl implements EntityMapper<OrderDto, Order> {
     private UserRepository userRepository;
     private GiftCertificateRepository giftCertificateRepository;
     private ModelMapper modelMapper;
+    private MessageProvider messageProvider;
 
     @Autowired
     public OrderMapperImpl(UserRepository userRepository, GiftCertificateRepository giftCertificateRepository) {
@@ -38,16 +40,22 @@ public class OrderMapperImpl implements EntityMapper<OrderDto, Order> {
         });
     }
 
+    @Autowired
+    public void setMessageProvider(MessageProvider messageProvider) {
+        this.messageProvider = messageProvider;
+    }
+
     @Override
     public Order toEntity(OrderDto dto) throws EntityMappingException {
         User user = userRepository.findOne(dto.getUserId())
-                .orElseThrow(() -> new EntityMappingException(String.format("User with id = %d not found", dto.getUserId())));
+                .orElseThrow(() -> new EntityMappingException(String.format(messageProvider.getMessage("message.error.user-not-found"),
+                        dto.getUserId())));
 
         List<GiftCertificate> certificates = new ArrayList<>(dto.getCertificates().size());
 
         for(Long certId: dto.getCertificates()) {
             GiftCertificate certificate = giftCertificateRepository.findOne(certId)
-                    .orElseThrow(() -> new EntityMappingException("Failed to find a gift certificate: " + certId));
+                    .orElseThrow(() -> new EntityMappingException(messageProvider.getMessage("message.error.certificate-not-found") + certId));
             certificates.add(certificate);
         }
 

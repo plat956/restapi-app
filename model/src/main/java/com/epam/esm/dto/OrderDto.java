@@ -16,7 +16,7 @@ public class OrderDto extends RepresentationModel<OrderDto> {
 
     private Long id;
 
-    @NotEmpty(message = "Please provide gift certificate ids")
+    @NotEmpty(message = "{validation.error.order.ids}")
     private List<Long> certificates;
 
     private Long userId;

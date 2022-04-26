@@ -16,8 +16,8 @@ import java.util.Optional;
 @Repository
 public class OrderRepositoryImpl extends SessionProvider implements OrderRepository {
 
-    private static final String FIND_BY_USER_ID_QUERY  = "FROM Order o WHERE o.user.id = :id";
-    private static final String COUNT_BY_USER_ID_QUERY  = "SELECT count(o) FROM Order o WHERE o.user.id = :id";
+    private static final String FIND_BY_USER_ID_QUERY = "FROM Order o WHERE o.user.id = :id";
+    private static final String COUNT_BY_USER_ID_QUERY = "SELECT count(o) FROM Order o WHERE o.user.id = :id";
 
     @Override
     public Optional<Order> findOne(Long id) {
@@ -31,7 +31,7 @@ public class OrderRepositoryImpl extends SessionProvider implements OrderReposit
 
     @Override
     public PagedModel<Order> findAllPaginated(RequestedPage page) {
-        throw new UnsupportedOperationException("FindAllPaginated method of an Order entity is not supported");
+        throw new UnsupportedOperationException("findAllPaginated method of an Order entity is not supported");
     }
 
     @Override

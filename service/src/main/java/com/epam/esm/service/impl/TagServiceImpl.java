@@ -4,6 +4,7 @@ import com.epam.esm.entity.Tag;
 import com.epam.esm.exception.ServiceException;
 import com.epam.esm.repository.TagRepository;
 import com.epam.esm.service.TagService;
+import com.epam.esm.util.MessageProvider;
 import com.epam.esm.util.RequestedPage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -16,10 +17,16 @@ import java.util.Optional;
 public class TagServiceImpl implements TagService {
 
     private TagRepository tagRepository;
+    private MessageProvider messageProvider;
 
     @Autowired
     public TagServiceImpl(TagRepository tagRepository) {
         this.tagRepository = tagRepository;
+    }
+
+    @Autowired
+    public void setMessageProvider(MessageProvider messageProvider) {
+        this.messageProvider = messageProvider;
     }
 
     @Override
@@ -37,7 +44,7 @@ public class TagServiceImpl implements TagService {
         try {
             return tagRepository.save(tag);
         } catch (DataIntegrityViolationException e) {
-            throw new ServiceException("This tag already exists", e);
+            throw new ServiceException(messageProvider.getMessage("message.error.tag-exists"), e);
         }
     }
 

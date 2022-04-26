@@ -3,6 +3,8 @@ package com.epam.esm.controller;
 import com.epam.esm.exception.ResourceDuplicateException;
 import com.epam.esm.exception.ResourceError;
 import com.epam.esm.exception.ResourceNotFoundException;
+import com.epam.esm.util.MessageProvider;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -17,24 +19,31 @@ import java.util.List;
 @RestControllerAdvice
 public class ExceptionController {
 
+    private MessageProvider messageProvider;
+
+    @Autowired
+    public ExceptionController(MessageProvider messageProvider) {
+        this.messageProvider = messageProvider;
+    }
+
     @ExceptionHandler(NoHandlerFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ResourceError handleNotFoundError() {
-        return new ResourceError(40401, "Requested resource is not found. No appropriate handlers");
+        return new ResourceError(40401, messageProvider.getMessage("message.error.no-handlers"));
     }
 
     @ExceptionHandler(ResourceNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ResourceError resourceNotFound(ResourceNotFoundException e) {
         String message = e.getResourceId() != null ?
-                String.format("Requested resource is not found (id = %d)", e.getResourceId()) : e.getMessage();
+                String.format(messageProvider.getMessage("message.error.no-resource"), e.getResourceId()) : e.getMessage();
         return new ResourceError(40402, message);
     }
 
     @ExceptionHandler(ResourceDuplicateException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResourceError resourceDuplicate(ResourceDuplicateException e) {
-        return new ResourceError(40001, String.format("The resource with %s '%s' already exists",
+        return new ResourceError(40001, String.format(messageProvider.getMessage("message.error.resource-duplicate"),
                 e.getUniqueField(), e.getUniqueFieldValue()));
     }
 
@@ -58,12 +67,12 @@ public class ExceptionController {
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResourceError wrongArgument(MethodArgumentTypeMismatchException e) {
-        return new ResourceError(40004, "Wrong parameter: " + e.getName());
+        return new ResourceError(40004, messageProvider.getMessage("message.error.wrong-param") + e.getName());
     }
 
     @ExceptionHandler(Exception.class)
     @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
     public ResourceError internalError(Exception ex) {
-        return new ResourceError(50001, "Something went wrong. We're working on solving the problem");
+        return new ResourceError(50001, messageProvider.getMessage("message.error.unexpected"));
     }
 }

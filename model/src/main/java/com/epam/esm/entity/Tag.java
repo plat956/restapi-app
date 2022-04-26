@@ -18,7 +18,7 @@ import javax.validation.constraints.Size;
 public class Tag extends BaseEntity<Long> {
 
     @Column(nullable = false, unique = true, length = 20)
-    @Size(max = 20, message = "Tag name must be less than or equal to 20 chars")
-    @NotBlank(message = "Please provide a tag name")
+    @Size(max = 20, message = "{validation.restrictions.tag.name}")
+    @NotBlank(message = "{validation.error.tag.name}")
     private String name;
 }

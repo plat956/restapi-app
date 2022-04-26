@@ -22,24 +22,24 @@ import java.util.Set;
 public class GiftCertificate extends BaseEntity<Long> {
 
     @Column(nullable = false, length = 80)
-    @Size(max = 80, message = "Name must be less than or equal to 80 chars")
-    @NotBlank(message = "Please provide a name")
+    @Size(max = 80, message = "{validation.restrictions.certificate.name}")
+    @NotBlank(message = "{validation.error.certificate.name}")
     private String name;
 
     @Column
-    @Size(max = 255, message = "Description must be less than or equal to 255 chars")
+    @Size(max = 255, message = "{validation.restrictions.certificate.descr}")
     private String description;
 
     @Column(nullable = false)
-    @Positive(message = "Price must be positive")
-    @DecimalMax(value = "999999.99", message = "Price must be less than a million")
-    @NotNull(message = "Please provide price")
+    @Positive(message = "{validation.restrictions.certificate.price-left}")
+    @DecimalMax(value = "999999.99", message = "{validation.restrictions.certificate.price-right}")
+    @NotNull(message = "{validation.error.certificate.price}")
     private BigDecimal price;
 
     @Column(nullable = false)
-    @Positive(message = "Duration must be positive")
-    @Max(value = 365, message = "Duration must be less than a year")
-    @NotNull(message = "Please provide duration")
+    @Positive(message = "{validation.restrictions.certificate.duration-left}")
+    @Max(value = 365, message = "{validation.restrictions.certificate.duration-right}")
+    @NotNull(message = "{validation.error.certificate.duration}")
     private Integer duration;
 
     @Column(nullable = false)
