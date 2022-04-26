@@ -1,5 +1,6 @@
 package com.epam.esm.service.impl;
 
+import com.epam.esm.dto.UserStatisticsDto;
 import com.epam.esm.entity.User;
 import com.epam.esm.repository.UserRepository;
 import com.epam.esm.service.UserService;
@@ -28,5 +29,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public PagedModel<User> findAllPaginated(RequestedPage page) {
         return userRepository.findAllPaginated(page);
+    }
+
+    @Override
+    public PagedModel<UserStatisticsDto> findUserStatistics(RequestedPage page) {
+        return userRepository.findUserStatistics(page);
     }
 }

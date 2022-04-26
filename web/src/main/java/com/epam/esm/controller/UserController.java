@@ -2,7 +2,9 @@ package com.epam.esm.controller;
 
 import com.epam.esm.assembler.OrderDtoModelAssembler;
 import com.epam.esm.assembler.UserModelAssembler;
+import com.epam.esm.assembler.UserStatisticsDtoModelAssembler;
 import com.epam.esm.dto.OrderDto;
+import com.epam.esm.dto.UserStatisticsDto;
 import com.epam.esm.entity.User;
 import com.epam.esm.exception.ResourceNotFoundException;
 import com.epam.esm.exception.ServiceException;
@@ -29,6 +31,7 @@ public class UserController {
     private OrderService orderService;
     private UserModelAssembler userModelAssembler;
     private OrderDtoModelAssembler orderDtoModelAssembler;
+    private UserStatisticsDtoModelAssembler statModelAssembler;
 
     @Autowired
     public UserController(UserService userService, OrderService orderService) {
@@ -44,6 +47,11 @@ public class UserController {
     @Autowired
     public void setOrderDtoModelAssembler(OrderDtoModelAssembler orderDtoModelAssembler) {
         this.orderDtoModelAssembler = orderDtoModelAssembler;
+    }
+
+    @Autowired
+    public void setStatModelAssembler(UserStatisticsDtoModelAssembler statModelAssembler) {
+        this.statModelAssembler = statModelAssembler;
     }
 
     /**
@@ -104,5 +112,19 @@ public class UserController {
         } catch (ServiceException ex) {
             throw new ResourceNotFoundException(ex.getMessage());
         }
+    }
+
+    /**
+     * Get top users statistics.
+     *
+     * @param page the requested page
+     * @param limit the requested records per page limit
+     * @return the top users statistics
+     */
+    @GetMapping("/statistics")
+    public PagedModel<EntityModel<UserStatisticsDto>> getStatistics(@RequestParam(value = "page", required = false) Long page,
+                                                                    @RequestParam(value = "limit", required = false) Long limit) {
+        PagedModel<UserStatisticsDto> statistics = userService.findUserStatistics(new RequestedPage(page, limit));
+        return statModelAssembler.toCollectionModel(statistics);
     }
 }

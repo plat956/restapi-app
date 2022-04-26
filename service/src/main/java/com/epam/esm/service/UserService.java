@@ -1,5 +1,6 @@
 package com.epam.esm.service;
 
+import com.epam.esm.dto.UserStatisticsDto;
 import com.epam.esm.entity.User;
 import com.epam.esm.util.RequestedPage;
 import org.springframework.hateoas.PagedModel;
@@ -26,4 +27,12 @@ public interface UserService {
      * @return the paged model with a list of users or empty one
      */
     PagedModel<User> findAllPaginated(RequestedPage page);
+
+    /**
+     * Find users by highest cost of all orders and their tag statistics.
+     *
+     * @param page the requested page
+     * @return the list of top users
+     */
+    PagedModel<UserStatisticsDto> findUserStatistics(RequestedPage page);
 }
