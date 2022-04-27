@@ -20,12 +20,8 @@ public class TagServiceImpl implements TagService {
     private MessageProvider messageProvider;
 
     @Autowired
-    public TagServiceImpl(TagRepository tagRepository) {
+    public TagServiceImpl(TagRepository tagRepository, MessageProvider messageProvider) {
         this.tagRepository = tagRepository;
-    }
-
-    @Autowired
-    public void setMessageProvider(MessageProvider messageProvider) {
         this.messageProvider = messageProvider;
     }
 

@@ -15,11 +15,12 @@ buildscript {
 plugins {
     id "org.springframework.boot" version "${springBootVersion}"
     id "io.spring.dependency-management" version "${springDependencyManagementVersion}"
-    id "war"
+    id 'application'
 }
 
 group "com.epam.esm"
 version "1.0-SNAPSHOT"
+mainClassName = 'com.epam.esm.Application'
 
 repositories {
     mavenCentral()
@@ -31,6 +32,14 @@ allprojects {
     apply plugin: "java"
 
     sourceCompatibility = JavaVersion.VERSION_17
+
+    bootJar {
+        enabled = false
+    }
+
+    jar {
+        enabled = true
+    }
 
     dependencies {
         implementation "org.springframework.boot:spring-boot-starter-web"

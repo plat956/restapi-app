@@ -3,6 +3,7 @@ package com.epam.esm.service.impl;
 import com.epam.esm.entity.Tag;
 import com.epam.esm.exception.ServiceException;
 import com.epam.esm.repository.TagRepository;
+import com.epam.esm.util.MessageProvider;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -21,6 +22,9 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class TagServiceImplTest {
+
+    @Mock
+    private MessageProvider messageProvider;
 
     @Mock
     private TagRepository tagRepository;
