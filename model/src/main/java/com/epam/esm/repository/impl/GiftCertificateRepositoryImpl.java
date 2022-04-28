@@ -137,7 +137,10 @@ public class GiftCertificateRepositoryImpl extends SessionProvider implements Gi
         fillFindAllQueryWithParams(tags, search, sort, cb, cq, cr);
         cq.orderBy(List.of());
         try {
-            return session.createQuery(cq).getSingleResult();
+            return session.createQuery(cq).getResultList()
+                    .stream()
+                    .mapToLong(Long::longValue)
+                    .sum();
         } catch (NoResultException ex) {
             return 0L;
         }

@@ -61,7 +61,7 @@ public class UserRepositoryImpl extends SessionProvider implements UserRepositor
             GROUP BY top_users.user_id, top_users.max_amount, gt.tag_id, usr_max_tag_cnt.cnt
             HAVING count(gt.tag_id) = usr_max_tag_cnt.cnt
             """;
-    private static final String COUNT_TOP_USERS_STATISTICS = "SELECT count(*) FROM (" + FIND_TOP_USERS_STATISTICS + ") stat";
+    private static final String COUNT_TOP_USERS_STATISTICS = "SELECT count(DISTINCT user_id) FROM (" + FIND_TOP_USERS_STATISTICS + ") stat";
 
     @Override
     public Optional<User> findOne(Long id) {
