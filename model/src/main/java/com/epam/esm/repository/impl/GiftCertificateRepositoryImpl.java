@@ -44,12 +44,8 @@ public class GiftCertificateRepositoryImpl extends SessionProvider implements Gi
 
     @Override
     public Optional<GiftCertificate> findOne(Long id) {
-        try {
-            GiftCertificate certificate = getSession().get(GiftCertificate.class, id);
-            return Optional.ofNullable(certificate);
-        } catch (NoResultException ex) {
-            return Optional.empty();
-        }
+        GiftCertificate certificate = getSession().get(GiftCertificate.class, id);
+        return Optional.ofNullable(certificate);
     }
 
     @Override

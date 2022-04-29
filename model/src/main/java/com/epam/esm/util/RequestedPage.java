@@ -25,29 +25,14 @@ public final class RequestedPage {
         this.offset = (this.page - 1) * this.limit;
     }
 
-    /**
-     * Gets the page.
-     *
-     * @return the page
-     */
     public Long getPage() {
         return page;
     }
 
-    /**
-     * Gets the limit.
-     *
-     * @return the limit
-     */
     public Long getLimit() {
         return limit;
     }
 
-    /**
-     * Gets the offset.
-     *
-     * @return the offset
-     */
     public Long getOffset() {
         return offset;
     }

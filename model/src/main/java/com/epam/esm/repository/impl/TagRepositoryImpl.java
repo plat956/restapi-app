@@ -25,12 +25,8 @@ public class TagRepositoryImpl extends SessionProvider implements TagRepository 
 
     @Override
     public Optional<Tag> findOne(Long id) {
-        try {
-            Tag tag = getSession().get(Tag.class, id);
-            return Optional.ofNullable(tag);
-        } catch (NoResultException ex) {
-            return Optional.empty();
-        }
+        Tag tag = getSession().get(Tag.class, id);
+        return Optional.ofNullable(tag);
     }
 
     @Override

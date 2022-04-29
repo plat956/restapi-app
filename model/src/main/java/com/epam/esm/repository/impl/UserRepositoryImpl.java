@@ -11,7 +11,6 @@ import org.hibernate.query.Query;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.stereotype.Repository;
 
-import javax.persistence.NoResultException;
 import javax.persistence.Tuple;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -65,13 +64,8 @@ public class UserRepositoryImpl extends SessionProvider implements UserRepositor
 
     @Override
     public Optional<User> findOne(Long id) {
-        try {
-            Session session = getSession();
-            User user = session.get(User.class, id);
-            return Optional.ofNullable(user);
-        } catch (NoResultException ex) {
-            return Optional.empty();
-        }
+        User user = getSession().get(User.class, id);
+        return Optional.ofNullable(user);
     }
 
     @Override

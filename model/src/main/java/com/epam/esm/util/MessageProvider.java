@@ -19,12 +19,6 @@ public class MessageProvider {
         this.messageSource = messageSource;
     }
 
-    /**
-     * Get a message.
-     *
-     * @param code the message code
-     * @return the message text
-     */
     public String getMessage(String code) {
         return messageSource.getMessage(code, null, LocaleContextHolder.getLocale());
     }

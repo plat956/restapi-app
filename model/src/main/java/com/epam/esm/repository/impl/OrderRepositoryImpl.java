@@ -9,7 +9,6 @@ import org.springframework.hateoas.PagedModel;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.NoResultException;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,12 +20,8 @@ public class OrderRepositoryImpl extends SessionProvider implements OrderReposit
 
     @Override
     public Optional<Order> findOne(Long id) {
-        try {
-            Order order = getSession().get(Order.class, id);
-            return Optional.ofNullable(order);
-        } catch (NoResultException ex) {
-            return Optional.empty();
-        }
+        Order order = getSession().get(Order.class, id);
+        return Optional.ofNullable(order);
     }
 
     @Override
