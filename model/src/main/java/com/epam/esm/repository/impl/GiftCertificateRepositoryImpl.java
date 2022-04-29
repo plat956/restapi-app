@@ -128,19 +128,17 @@ public class GiftCertificateRepositoryImpl extends SessionProvider implements Gi
 
         CriteriaQuery<Long> cq = cb.createQuery(Long.class);
         Root<GiftCertificate> cr = cq.from(GiftCertificate.class);
-        cq.select(cb.count(cr));
+        cq.select(cr.get("id"));
 
         fillFindAllQueryWithParams(tags, search, sort, cb, cq, cr);
         cq.orderBy(List.of());
         try {
-            return session.createQuery(cq).getResultList()
-                    .stream()
-                    .mapToLong(Long::longValue)
-                    .sum();
+            return (long) session.createQuery(cq).getResultList().size();
         } catch (NoResultException ex) {
             return 0L;
         }
     }
+
 
     private void fillFindAllQueryWithParams(List<String> tags, String search, List<String> sort,
                            CriteriaBuilder cb, CriteriaQuery cq, Root certRoot) {
