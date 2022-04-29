@@ -1,69 +1,52 @@
 package com.epam.esm.repository.impl;
 
 import com.epam.esm.entity.Tag;
+import com.epam.esm.repository.SessionProvider;
 import com.epam.esm.repository.TagRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
+import com.epam.esm.util.RequestedPage;
+import org.hibernate.Session;
+import org.hibernate.query.Query;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.stereotype.Repository;
 
+import javax.persistence.NoResultException;
+import javax.transaction.Transactional;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
-import static com.epam.esm.repository.identity.ColumnName.ENTITY_ID;
-import static com.epam.esm.repository.identity.ColumnName.TAG_NAME;
-import static com.epam.esm.repository.identity.TableName.TAG_TABLE_NAME;
-
 @Repository
-public class TagRepositoryImpl implements TagRepository {
+public class TagRepositoryImpl extends SessionProvider implements TagRepository {
 
-    private static final String FIND_BY_ID_QUERY = "SELECT id, name FROM tag WHERE id = ?";
-    private static final String FIND_BY_NAME = "SELECT id, name FROM tag WHERE name = ?";
-    private static final String FIND_ALL_QUERY = "SELECT id, name FROM tag";
-    private static final String FIND_BY_GIFT_CERTIFICATE_ID = """
-            SELECT t.id, t.name FROM tag t
-            JOIN gift_certificate_tag gct 
-            ON t.id = gct.tag_id 
-            WHERE gct.gift_certificate_id = ?""";
-    private static final String DELETE_BY_ID_QUERY = "DELETE FROM tag WHERE id = ?";
-
-    private JdbcTemplate jdbcTemplate;
-    private SimpleJdbcInsert simpleJdbcInsert;
-
-    @Autowired
-    public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
-    }
-
-    @Autowired
-    public void setSimpleJdbcInsert(SimpleJdbcInsert simpleJdbcInsert) {
-        this.simpleJdbcInsert = simpleJdbcInsert;
-        this.simpleJdbcInsert.withTableName(TAG_TABLE_NAME).usingGeneratedKeyColumns(ENTITY_ID);
-    }
+    private static final String FIND_BY_GIFT_CERTIFICATE_ID_QUERY = "SELECT g.tags FROM GiftCertificate g WHERE g.id = :id";
+    private static final String FIND_BY_NAME_QUERY = "FROM Tag t WHERE t.name = :name";
+    private static final String FIND_ALL_QUERY = "FROM Tag t";
+    private static final String COUNT_ALL_QUERY = "SELECT count(t) FROM Tag t";
+    private static final String DELETE_BY_ID_QUERY = "DELETE FROM Tag t WHERE t.id = :id";
 
     @Override
     public Optional<Tag> findOne(Long id) {
-        try {
-            Tag tag = jdbcTemplate.queryForObject(FIND_BY_ID_QUERY,
-                    new BeanPropertyRowMapper<>(Tag.class), id);
-            return Optional.of(tag);
-        } catch (EmptyResultDataAccessException e) {
-            return Optional.empty();
-        }
+        Tag tag = getSession().get(Tag.class, id);
+        return Optional.ofNullable(tag);
     }
 
     @Override
-    public List<Tag> findAll() {
-        return jdbcTemplate.query(FIND_ALL_QUERY, new BeanPropertyRowMapper<>(Tag.class));
+    public PagedModel<Tag> findAllPaginated(RequestedPage page) {
+        Session session = getSession();
+        Query<Tag> query = session.createQuery(FIND_ALL_QUERY);
+        query.setFirstResult(page.getOffset().intValue());
+        query.setMaxResults(page.getLimit().intValue());
+        List<Tag> tags = query.getResultList();
+
+        Query<Long> countQuery = getSession().createQuery(COUNT_ALL_QUERY);
+        Long totalRecords = countQuery.getSingleResult();
+
+        PagedModel.PageMetadata metadata = new PagedModel.PageMetadata(page.getLimit(), page.getPage(), totalRecords);
+        return PagedModel.of(tags, metadata);
     }
 
     @Override
     public Tag save(Tag entity) {
-        Number newId = simpleJdbcInsert.executeAndReturnKey(Map.of(TAG_NAME, entity.getName()));
-        entity.setId(newId.longValue());
+        getSession().save(entity);
         return entity;
     }
 
@@ -73,21 +56,30 @@ public class TagRepositoryImpl implements TagRepository {
     }
 
     @Override
+    @Transactional
     public void delete(Long id) {
-        jdbcTemplate.update(DELETE_BY_ID_QUERY, id);
+        Query<Tag> query = getSession().createQuery(DELETE_BY_ID_QUERY);
+        query.setParameter("id", id);
+        query.executeUpdate();
     }
 
     @Override
     public List<Tag> findByGiftCertificateId(Long id) {
-        return jdbcTemplate.query(FIND_BY_GIFT_CERTIFICATE_ID, new BeanPropertyRowMapper<>(Tag.class), id);
+        Session session = getSession();
+        Query<Tag> query = session.createQuery(FIND_BY_GIFT_CERTIFICATE_ID_QUERY);
+        query.setParameter("id", id);
+        return query.list();
     }
 
     @Override
     public Optional<Tag> findByName(String name) {
         try {
-            Tag tag = jdbcTemplate.queryForObject(FIND_BY_NAME, new BeanPropertyRowMapper<>(Tag.class), name);
-            return Optional.of(tag);
-        } catch (EmptyResultDataAccessException e) {
+            Session session = getSession();
+            Query<Tag> query = session.createQuery(FIND_BY_NAME_QUERY);
+            query.setParameter("name", name);
+            Tag tag = query.getSingleResult();
+            return Optional.ofNullable(tag);
+        } catch (NoResultException ex) {
             return Optional.empty();
         }
     }

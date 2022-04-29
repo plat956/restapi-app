@@ -1,13 +1,21 @@
-plugins {
-    id 'java-library'
+buildscript {
+    ext {
+        lombokVersion = "1.18.22"
+    }
 }
 
-group 'com.epam.esm'
-version '1.0-SNAPSHOT'
+plugins {
+    id "java-library"
+}
+
+group "com.epam.esm"
+version "1.0-SNAPSHOT"
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
+    compileOnly "org.projectlombok:lombok:$lombokVersion"
+    annotationProcessor "org.projectlombok:lombok:$lombokVersion"
 }

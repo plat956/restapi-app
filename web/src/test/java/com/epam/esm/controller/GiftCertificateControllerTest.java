@@ -1,28 +1,22 @@
 package com.epam.esm.controller;
 
-import com.epam.esm.config.profile.TestProfileConfig;
 import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.entity.Tag;
 import com.epam.esm.exception.ResourceNotFoundException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hamcrest.core.IsNull;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.json.AutoConfigureJson;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
 
 import java.math.BigDecimal;
 
@@ -31,48 +25,42 @@ import static org.hamcrest.Matchers.containsInRelativeOrder;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = TestProfileConfig.class)
+@SpringBootTest
+@AutoConfigureJson
+@AutoConfigureMockMvc
 @ActiveProfiles("test")
-@WebAppConfiguration
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class GiftCertificateControllerTest {
-
-    @Autowired
-    private WebApplicationContext webApplicationContext;
 
     @Autowired
     private ObjectMapper objectMapper;
 
+    @Autowired
     private MockMvc mockMvc;
-
-    @BeforeAll
-    void setup() {
-        this.mockMvc = MockMvcBuilders.webAppContextSetup(this.webApplicationContext).build();
-    }
 
     @Test
     void getAll() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/certificates"))
                 .andExpect(handler().handlerType(GiftCertificateController.class))
                 .andExpect(handler().methodName("getAll"))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.page").exists());
     }
 
     @Test
     void getAllParametrized() throws Exception {
-        String tag = "online";
+        String tags = "online";
         String sort = "+name,-createDate";
         String search = "ificate";
 
         mockMvc.perform(MockMvcRequestBuilders.get("/certificates")
-                .param("tag", tag)
+                .param("tags", tags)
                 .param("sort", sort)
                 .param("search", search))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[*].tags[?(@.name == \'online\')]").exists())
-                .andExpect(jsonPath("$[*].name", containsInRelativeOrder("Evroopt delivery certificate", "Gym Minsk certificate", "New Year certificate")))
-                .andExpect(jsonPath("$[*].createDate", containsInRelativeOrder("2022-01-06T14:29:04", "2021-01-01T20:48:32", "2020-12-06T14:29:04")));
+                .andExpect(jsonPath("$._embedded.certificates[*].tags[?(@.name == \'online\')]").exists())
+                .andExpect(jsonPath("$._embedded.certificates[*].name", containsInRelativeOrder("Evroopt delivery certificate", "Gym Minsk certificate", "New Year certificate")))
+                .andExpect(jsonPath("$._embedded.certificates[*].createDate", containsInRelativeOrder("2022-01-06T14:29:04", "2021-01-01T20:48:32", "2020-12-06T14:29:04")))
+                .andExpect(jsonPath("$.page").exists());
     }
 
     @ParameterizedTest
@@ -147,7 +135,19 @@ class GiftCertificateControllerTest {
     }
 
     @ParameterizedTest
-    @ValueSource(longs = 4L)
+    @CsvSource("4, 7")
+    void unbindTag(Long certId, Long tagId) throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get("/certificates/{id}", certId))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.tags[?(@.id == " + tagId + ")]").exists());
+
+        mockMvc.perform(MockMvcRequestBuilders.delete("/certificates/{certId}/tags/{tagId}", certId, tagId))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.tags[?(@.id == " + tagId + ")]").doesNotExist());
+    }
+
+    @ParameterizedTest
+    @ValueSource(longs = 5L)
     void delete(Long id) throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/certificates/{id}", id))
                 .andExpect(status().isOk());

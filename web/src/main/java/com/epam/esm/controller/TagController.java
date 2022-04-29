@@ -1,16 +1,20 @@
 package com.epam.esm.controller;
 
+import com.epam.esm.assembler.TagModelAssembler;
 import com.epam.esm.entity.Tag;
 import com.epam.esm.exception.ResourceDuplicateException;
 import com.epam.esm.exception.ResourceNotFoundException;
 import com.epam.esm.exception.ServiceException;
 import com.epam.esm.service.TagService;
+import com.epam.esm.util.RequestedPage;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.List;
 
 
 /**
@@ -21,20 +25,26 @@ import java.util.List;
 public class TagController {
 
     private TagService tagService;
+    private TagModelAssembler tagModelAssembler;
 
     @Autowired
-    public TagController(TagService tagService) {
+    public TagController(TagService tagService, TagModelAssembler tagModelAssembler) {
         this.tagService = tagService;
+        this.tagModelAssembler = tagModelAssembler;
     }
 
     /**
      * Get all tags.
      *
+     * @param page the requested page
+     * @param limit the requested records per page limit
      * @return all available tags
      */
     @GetMapping
-    public List<Tag> getAll() {
-        return tagService.findAll();
+    public CollectionModel<EntityModel<Tag>> getAll(@RequestParam(value = "page", required = false) Long page,
+                                                    @RequestParam(value = "limit", required = false) Long limit) {
+        PagedModel<Tag> tags = tagService.findAllPaginated(new RequestedPage(page, limit));
+        return tagModelAssembler.toCollectionModel(tags);
     }
 
     /**
@@ -44,8 +54,9 @@ public class TagController {
      * @return found tag, otherwise error response with 40401 status code
      */
     @GetMapping("/{id}")
-    public Tag getOne(@PathVariable("id") Long id) {
-        return tagService.findOne(id).orElseThrow(() -> new ResourceNotFoundException(id));
+    public EntityModel<Tag> getOne(@PathVariable("id") Long id) {
+        Tag tag = tagService.findOne(id).orElseThrow(() -> new ResourceNotFoundException(id));
+        return tagModelAssembler.toModelWithAllLink(tag);
     }
 
     /**
@@ -56,9 +67,10 @@ public class TagController {
      */
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Tag save(@RequestBody @Valid Tag tag) {
+    public EntityModel<Tag> save(@RequestBody @Valid Tag tag) {
         try {
-            return tagService.save(tag);
+            Tag t = tagService.save(tag);
+            return tagModelAssembler.toModelWithAllLink(t);
         } catch (ServiceException ex) {
             throw new ResourceDuplicateException("name", tag.getName());
         }

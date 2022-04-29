@@ -3,14 +3,13 @@ package com.epam.esm.service.impl;
 import com.epam.esm.entity.Tag;
 import com.epam.esm.exception.ServiceException;
 import com.epam.esm.repository.TagRepository;
+import com.epam.esm.util.MessageProvider;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.DuplicateKeyException;
 
@@ -25,15 +24,13 @@ import static org.mockito.Mockito.*;
 public class TagServiceImplTest {
 
     @Mock
+    private MessageProvider messageProvider;
+
+    @Mock
     private TagRepository tagRepository;
 
     @InjectMocks
     private TagServiceImpl tagService;
-
-    @BeforeAll
-    public void setUp() {
-        MockitoAnnotations.openMocks(this);
-    }
 
     @Test
     void findOne() {

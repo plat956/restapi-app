@@ -2,6 +2,8 @@ package com.epam.esm.service;
 
 import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.exception.ServiceException;
+import com.epam.esm.util.RequestedPage;
+import org.springframework.hateoas.PagedModel;
 
 import java.util.List;
 import java.util.Optional;
@@ -22,21 +24,23 @@ public interface GiftCertificateService {
     /**
      * Find all gift certificates.
      *
-     * @return the list of gift certificates or empty one
+     * @param page the requested page
+     * @return the paged model with a list of gift certificates or empty one
      */
-    List<GiftCertificate> findAll();
+    PagedModel<GiftCertificate> findAllPaginated(RequestedPage page);
 
     /**
      * Find all gift certificates parametrized.
      *
-     * @param tag the tag name related to a certificate
+     * @param tags the tag name related to a certificate
      * @param search      the part of name/description of a certificate
      * @param sort        the sequence of fields to sort the result,
      *                    start with ordering type (+ ASC or - DESC) and a field to sort (available fields: createDate, lastUpdateDate, name).
      *                    Eg. -createDate,+name
-     * @return the list of suitable gift certificates
+     * @param page the requested page
+     * @return the paged model with a list of suitable gift certificates
      */
-    List<GiftCertificate> findAll(String tag, String search, String sort);
+    PagedModel<GiftCertificate> findAllPaginated(List<String> tags, String search, List<String> sort, RequestedPage page);
 
     /**
      * Save a gift certificate.
@@ -62,4 +66,24 @@ public interface GiftCertificateService {
      * @param id the gift certificate id
      */
     void delete(Long id);
+
+    /**
+     * Unbind a tag from a certificate.
+     *
+     * @param certificateId the gift certificate id
+     * @param tagId the tag id to be removed
+     * @return the gift certificate without the removed tag
+     * @throws ServiceException the service exception, if no any gift certificates found with this id
+     */
+    GiftCertificate unbindTag(Long certificateId, Long tagId) throws ServiceException;
+
+
+    /**
+     * Find gift certificates by order id.
+     *
+     * @param id   the gift certificate id
+     * @param page the requested page
+     * @return the paged model with a list of found certificates
+     */
+    PagedModel<GiftCertificate> findByOrderIdPaginated(Long id, RequestedPage page);
 }

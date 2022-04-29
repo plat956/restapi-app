@@ -1,20 +1,25 @@
-plugins {
-    id 'java-library'
+buildscript {
+    ext {
+        mockitoVersion = "4.4.0"
+    }
 }
 
-group 'com.epam.esm'
-version '1.0-SNAPSHOT'
+plugins {
+    id "java-library"
+}
+
+group "com.epam.esm"
+version "1.0-SNAPSHOT"
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    api project(':model')
-    testImplementation 'org.springframework:spring-test:5.3.18'
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.7.2'
-    testImplementation 'org.mockito:mockito-core:4.4.0'
-    testImplementation 'org.mockito:mockito-junit-jupiter:4.4.0'
+    api project(":model")
+    testImplementation "org.junit.jupiter:junit-jupiter:$junitVersion"
+    testImplementation "org.mockito:mockito-core:$mockitoVersion"
+    testImplementation "org.mockito:mockito-junit-jupiter:$mockitoVersion"
 }
 
 test {

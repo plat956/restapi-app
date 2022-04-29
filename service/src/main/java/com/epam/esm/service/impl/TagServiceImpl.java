@@ -2,23 +2,27 @@ package com.epam.esm.service.impl;
 
 import com.epam.esm.entity.Tag;
 import com.epam.esm.exception.ServiceException;
-import com.epam.esm.service.TagService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DuplicateKeyException;
-import org.springframework.stereotype.Service;
 import com.epam.esm.repository.TagRepository;
+import com.epam.esm.service.TagService;
+import com.epam.esm.util.MessageProvider;
+import com.epam.esm.util.RequestedPage;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.hateoas.PagedModel;
+import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
 
 @Service
 public class TagServiceImpl implements TagService {
 
     private TagRepository tagRepository;
+    private MessageProvider messageProvider;
 
     @Autowired
-    public TagServiceImpl(TagRepository tagRepository) {
+    public TagServiceImpl(TagRepository tagRepository, MessageProvider messageProvider) {
         this.tagRepository = tagRepository;
+        this.messageProvider = messageProvider;
     }
 
     @Override
@@ -27,16 +31,16 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public List<Tag> findAll() {
-        return tagRepository.findAll();
+    public PagedModel<Tag> findAllPaginated(RequestedPage page) {
+        return tagRepository.findAllPaginated(page);
     }
 
     @Override
     public Tag save(Tag tag) throws ServiceException {
         try {
             return tagRepository.save(tag);
-        } catch (DuplicateKeyException e) {
-            throw new ServiceException("This tag already exists", e);
+        } catch (DataIntegrityViolationException e) {
+            throw new ServiceException(messageProvider.getMessage("message.error.tag-exists"), e);
         }
     }
 

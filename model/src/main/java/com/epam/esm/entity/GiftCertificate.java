@@ -1,7 +1,12 @@
 package com.epam.esm.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
+import org.springframework.hateoas.server.core.Relation;
 
+import javax.persistence.*;
 import javax.validation.Valid;
 import javax.validation.constraints.*;
 import java.math.BigDecimal;
@@ -9,129 +14,47 @@ import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
+@Entity
+@Table(name = "gift_certificates")
+@Data
+@NoArgsConstructor
+@Relation(collectionRelation = "certificates")
 public class GiftCertificate extends BaseEntity<Long> {
 
-    @Size(max = 80, message = "Name must be less than or equal to 80 chars")
-    @NotBlank(message = "Please provide the name")
+    @Column(nullable = false, length = 80)
+    @Size(max = 80, message = "{validation.restrictions.certificate.name}")
+    @NotBlank(message = "{validation.error.certificate.name}")
     private String name;
 
-    @Size(max = 255, message = "Description must be less than or equal to 255 chars")
-    @NotBlank(message = "Please provide the description")
+    @Column
+    @Size(max = 255, message = "{validation.restrictions.certificate.descr}")
     private String description;
 
-    @Positive(message = "Price must be positive")
-    @DecimalMax(value = "999999.99", message = "Price must be less than a million")
-    @NotNull(message = "Please provide the price")
+    @Column(nullable = false)
+    @Positive(message = "{validation.restrictions.certificate.price-left}")
+    @DecimalMax(value = "999999.99", message = "{validation.restrictions.certificate.price-right}")
+    @NotNull(message = "{validation.error.certificate.price}")
     private BigDecimal price;
 
-    @Positive(message = "Duration must be positive")
-    @Max(value = 365, message = "Duration must be less than a year")
-    @NotNull(message = "Please provide the duration")
+    @Column(nullable = false)
+    @Positive(message = "{validation.restrictions.certificate.duration-left}")
+    @Max(value = 365, message = "{validation.restrictions.certificate.duration-right}")
+    @NotNull(message = "{validation.error.certificate.duration}")
     private Integer duration;
 
+    @Column(nullable = false)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime createDate;
 
+    @Column
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime lastUpdateDate;
 
+    @ManyToMany
+    @JoinTable(name = "gift_certificate_tag",
+            joinColumns = @JoinColumn(name = "gift_certificate_id"),
+            inverseJoinColumns = @JoinColumn(name = "tag_id")
+    )
+    @ToString.Exclude
     private Set<@Valid Tag> tags = new HashSet<>();
-
-    public GiftCertificate() {
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public BigDecimal getPrice() {
-        return price;
-    }
-
-    public void setPrice(BigDecimal price) {
-        this.price = price;
-    }
-
-    public Integer getDuration() {
-        return duration;
-    }
-
-    public void setDuration(Integer duration) {
-        this.duration = duration;
-    }
-
-    public LocalDateTime getCreateDate() {
-        return createDate;
-    }
-
-    public void setCreateDate(LocalDateTime createDate) {
-        this.createDate = createDate;
-    }
-
-    public LocalDateTime getLastUpdateDate() {
-        return lastUpdateDate;
-    }
-
-    public void setLastUpdateDate(LocalDateTime lastUpdateDate) {
-        this.lastUpdateDate = lastUpdateDate;
-    }
-
-    public Set<Tag> getTags() {
-        return tags;
-    }
-
-    public void setTags(Set<Tag> tags) {
-        this.tags = tags;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        GiftCertificate that = (GiftCertificate) o;
-
-        if (name != null ? !name.equals(that.name) : that.name != null) return false;
-        if (description != null ? !description.equals(that.description) : that.description != null) return false;
-        if (price != null ? !price.equals(that.price) : that.price != null) return false;
-        if (duration != null ? !duration.equals(that.duration) : that.duration != null) return false;
-        if (createDate != null ? !createDate.equals(that.createDate) : that.createDate != null) return false;
-        return lastUpdateDate != null ? lastUpdateDate.equals(that.lastUpdateDate) : that.lastUpdateDate == null;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = name != null ? name.hashCode() : 0;
-        result = 31 * result + (description != null ? description.hashCode() : 0);
-        result = 31 * result + (price != null ? price.hashCode() : 0);
-        result = 31 * result + (duration != null ? duration.hashCode() : 0);
-        result = 31 * result + (createDate != null ? createDate.hashCode() : 0);
-        result = 31 * result + (lastUpdateDate != null ? lastUpdateDate.hashCode() : 0);
-        return result;
-    }
-
-    @Override
-    public String toString() {
-        final StringBuilder sb = new StringBuilder("GiftCertificate{");
-        sb.append("name='").append(name).append('\'');
-        sb.append(", description='").append(description).append('\'');
-        sb.append(", price=").append(price);
-        sb.append(", duration=").append(duration);
-        sb.append(", createDate=").append(createDate);
-        sb.append(", lastUpdateDate=").append(lastUpdateDate);
-        sb.append('}');
-        return sb.toString();
-    }
 }

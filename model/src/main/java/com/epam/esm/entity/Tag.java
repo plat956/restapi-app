@@ -1,45 +1,24 @@
 package com.epam.esm.entity;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.springframework.hateoas.server.core.Relation;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
+@Entity
+@Table(name = "tags")
+@Data
+@NoArgsConstructor
+@Relation(collectionRelation = "tags")
 public class Tag extends BaseEntity<Long> {
 
-    @Size(max = 20, message = "Tag name must be less than or equal to 20 chars")
-    @NotBlank(message = "Please provide a tag name")
+    @Column(nullable = false, unique = true, length = 20)
+    @Size(max = 20, message = "{validation.restrictions.tag.name}")
+    @NotBlank(message = "{validation.error.tag.name}")
     private String name;
-
-    public Tag() {
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        Tag tag = (Tag) o;
-
-        return name != null ? name.equals(tag.name) : tag.name == null;
-    }
-
-    @Override
-    public int hashCode() {
-        return name != null ? name.hashCode() : 0;
-    }
-
-    @Override
-    public String toString() {
-        final StringBuilder sb = new StringBuilder("Tag{");
-        sb.append("name='").append(name).append('\'');
-        sb.append('}');
-        return sb.toString();
-    }
 }
