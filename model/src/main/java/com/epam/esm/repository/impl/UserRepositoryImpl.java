@@ -22,43 +22,33 @@ public class UserRepositoryImpl extends SessionProvider implements UserRepositor
     private static final String FIND_ALL_QUERY = "FROM User u";
     private static final String COUNT_ALL_QUERY = "SELECT count(u) FROM User u";
     private static final String FIND_TOP_USERS_STATISTICS = """
-            SELECT top_users.user_id, top_users.max_amount, gt.tag_id, count(gt.tag_id) as tag_count
-            FROM (
-            		SELECT o.user_id as user_id, sum(o.cost) as max_amount
-            		FROM orders o
-            		GROUP BY o.user_id
-            		HAVING sum(o.cost) = (SELECT sum(o.cost) as amount FROM orders o GROUP BY o.user_id ORDER BY amount DESC LIMIT 1)
-            ) top_users
-                        
-            INNER JOIN orders o ON o.user_id = top_users.user_id
-            INNER JOIN order_certificate oc ON oc.order_id = o.id
-            INNER JOIN gift_certificate_tag gt ON gt.gift_certificate_id = oc.gift_certificate_id
-                        
-            INNER JOIN (
-            		SELECT user_id, max(tag_count) as cnt
-            		FROM (
-            				SELECT user_id, max_amount, tag_id, tag_count
-            				FROM (
-            						SELECT top_users.user_id, top_users.max_amount, gt.tag_id, count(gt.tag_id) as tag_count
-            						FROM (
-            								SELECT o.user_id as user_id, sum(o.cost) as max_amount
-            								FROM orders o
-            								GROUP BY o.user_id
-            								HAVING sum(o.cost) = (SELECT sum(o.cost) as amount FROM orders o GROUP BY o.user_id ORDER BY amount DESC LIMIT 1)
-            						) top_users
-            					
-            						INNER JOIN orders o ON o.user_id = top_users.user_id
-            						INNER JOIN order_certificate oc ON oc.order_id = o.id
-            						INNER JOIN gift_certificate_tag gt ON gt.gift_certificate_id = oc.gift_certificate_id
-            						GROUP BY top_users.user_id, top_users.max_amount, gt.tag_id
-            				) as top_stat
-            		) as top_tags
-            		GROUP BY user_id
-            ) as usr_max_tag_cnt
-                        
-            ON top_users.user_id = usr_max_tag_cnt.user_id
-            GROUP BY top_users.user_id, top_users.max_amount, gt.tag_id, usr_max_tag_cnt.cnt
-            HAVING count(gt.tag_id) = usr_max_tag_cnt.cnt
+                SELECT top_user.user_id, top_user.max_amount, gt.tag_id, count(gt.tag_id) as tag_count
+                FROM (
+                        SELECT user_id, max(tag_count) as max_tag_count, max_amount
+                        FROM (
+                                
+                                SELECT top_user_amount.user_id, top_user_amount.max_amount, gt.tag_id, count(gt.tag_id) as tag_count
+                                FROM (
+                                        SELECT o.user_id, sum(o.cost) as max_amount
+                                        FROM orders o
+                                        GROUP BY o.user_id
+                                        HAVING sum(o.cost) = (SELECT sum(o.cost) as amount FROM orders o GROUP BY o.user_id ORDER BY amount DESC LIMIT 1)
+                                ) top_user_amount
+                            
+                                INNER JOIN orders o ON o.user_id = top_user_amount.user_id
+                                INNER JOIN order_certificate oc ON oc.order_id = o.id
+                                INNER JOIN gift_certificate_tag gt ON gt.gift_certificate_id = oc.gift_certificate_id
+                                GROUP BY top_user_amount.user_id, top_user_amount.max_amount, gt.tag_id
+                                
+                        ) as top_user_tag GROUP BY user_id, max_amount
+                ) as top_user
+                
+                INNER JOIN orders o ON o.user_id = top_user.user_id
+                INNER JOIN order_certificate oc ON oc.order_id = o.id
+                INNER JOIN gift_certificate_tag gt ON gt.gift_certificate_id = oc.gift_certificate_id
+                                        
+                GROUP BY top_user.user_id, top_user.max_amount, gt.tag_id, top_user.max_tag_count
+                HAVING count(gt.tag_id) = top_user.max_tag_count
             """;
     private static final String COUNT_TOP_USERS_STATISTICS = "SELECT count(DISTINCT user_id) FROM (" + FIND_TOP_USERS_STATISTICS + ") stat";
 
