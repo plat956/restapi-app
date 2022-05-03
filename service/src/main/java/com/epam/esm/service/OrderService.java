@@ -2,8 +2,8 @@ package com.epam.esm.service;
 
 import com.epam.esm.dto.OrderDto;
 import com.epam.esm.exception.ServiceException;
-import com.epam.esm.util.RequestedPage;
-import org.springframework.hateoas.PagedModel;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.Optional;
 
@@ -18,16 +18,16 @@ public interface OrderService {
      * @param id the order id
      * @return the optional with an order object if it exists, otherwise the empty optional
      */
-    Optional<OrderDto> findOne(Long id);
+    Optional<OrderDto> findById(Long id);
 
     /**
      * Find orders by user id.
      *
      * @param id the user id
-     * @param page the requested page
-     * @return the paged model with a list of orders or empty one
+     * @param pageable object containing page and size request parameters
+     * @return the page object with orders or empty one
      */
-    PagedModel<OrderDto> findByUserIdPaginated(Long id, RequestedPage page);
+    Page<OrderDto> findByUserId(Long id, Pageable pageable);
 
     /**
      * Create an order.

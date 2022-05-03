@@ -5,8 +5,9 @@ import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.exception.ResourceNotFoundException;
 import com.epam.esm.exception.ServiceException;
 import com.epam.esm.service.GiftCertificateService;
-import com.epam.esm.util.RequestedPage;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
@@ -40,21 +41,20 @@ public class GiftCertificateController {
      *
      * @param tags    the list of tag names related to a certificate
      * @param search the part of name/description of a certificate
-     * @param sort   the sequence of fields to sort the result,
+     * @param sorts   the sequence of fields to sort the result,
      *               start with ordering type (+ ASC or - DESC) and a field to sort (available fields: createDate, lastUpdateDate, name).
      *               Eg. -createDate,+name
-     * @param page the requested page
-     * @param limit the requested records per page limit
+     * @param pageable object containing page and size request parameters
      * @return all suitable gift certificates
      */
     @GetMapping
-    public PagedModel<EntityModel<GiftCertificate>> getAll(@RequestParam(value = "tags", required = false) List<String> tags,
-                                                                 @RequestParam(value = "search", required = false) String search,
-                                                                 @RequestParam(value = "sort", required = false) List<String> sort,
-                                                                 @RequestParam(value = "page", required = false) Long page,
-                                                                 @RequestParam(value = "limit", required = false) Long limit) {
-        PagedModel<GiftCertificate> certificates = giftCertificateService.findAllPaginated(tags, search, sort, new RequestedPage(page, limit));
-        return certificateModelAssembler.toCollectionModel(certificates, tags, search, sort);
+    public PagedModel<GiftCertificate> getAll(@RequestParam(value = "tags", required = false) List<String> tags,
+                                                           @RequestParam(value = "search", required = false) String search,
+                                                           @RequestParam(value = "sorts", required = false) List<String> sorts,
+                                                           @PageableDefault Pageable pageable) {
+//        Page<GiftCertificate> certificates = giftCertificateService.findAll(tags, search, sort, page, size);
+//        return certificateModelAssembler.toPagedModel(certificates);
+        return null; //fixme
     }
 
     /**
@@ -65,7 +65,7 @@ public class GiftCertificateController {
      */
     @GetMapping("/{id}")
     public EntityModel<GiftCertificate> getOne(@PathVariable("id") Long id) {
-        GiftCertificate certificate = giftCertificateService.findOne(id)
+        GiftCertificate certificate = giftCertificateService.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(id));
         return certificateModelAssembler.toModelWithAllLink(certificate);
     }
@@ -127,6 +127,10 @@ public class GiftCertificateController {
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable("id") Long id) {
-        giftCertificateService.delete(id);
+        try {
+            giftCertificateService.delete(id);
+        } catch (ServiceException ex) {
+            throw new ResourceNotFoundException(id);
+        }
     }
 }

@@ -4,6 +4,7 @@ import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.entity.Tag;
 import com.epam.esm.exception.ServiceException;
 import com.epam.esm.repository.GiftCertificateRepository;
+import com.epam.esm.repository.TagRepository;
 import com.epam.esm.service.GiftCertificateService;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -31,6 +32,9 @@ class GiftCertificateServiceImplTest {
 
     @Mock
     private GiftCertificateRepository giftCertificateRepository;
+
+    @Mock
+    private TagRepository tagRepository;
 
     @Spy
     private ModelMapper modelMapper;
@@ -83,7 +87,7 @@ class GiftCertificateServiceImplTest {
     void setUpEach(TestInfo info) {
         String method = info.getTestMethod().get().getName();
         if (!method.equals("save") && !method.equals("delete")) {
-            when(giftCertificateRepository.findOne(anyLong())).
+            when(giftCertificateRepository.findById(anyLong())).
                     thenAnswer(invocation -> giftCertificates.stream().
                             filter(u -> u.getId().equals(invocation.getArgument(0))).
                             findAny());
@@ -92,7 +96,7 @@ class GiftCertificateServiceImplTest {
 
     @Test
     void findOne() {
-        Optional<GiftCertificate> cert = giftCertificateService.findOne(2L);
+        Optional<GiftCertificate> cert = giftCertificateService.findById(2L);
         String expected = "descr of cert2";
         String actual = cert.get().getDescription();
         assertEquals(expected, actual);
@@ -114,15 +118,21 @@ class GiftCertificateServiceImplTest {
     @ParameterizedTest
     @ValueSource(longs = 3L)
     void updateTrue(Long id) throws ServiceException {
+        when(tagRepository.findByName(anyString())).thenAnswer(invocation -> {
+            Tag t = new Tag();
+            t.setId(1L);
+            return Optional.of(t);
+        });
+
         GiftCertificate c = new GiftCertificate();
         c.setPrice(BigDecimal.ZERO);
 
         GiftCertificateService spyService = spy(giftCertificateService);
         spyService.update(id, c);
-        verify(spyService).findOne(id);
+        verify(spyService).findById(id);
 
         ArgumentCaptor<GiftCertificate> updateArgument = ArgumentCaptor.forClass(GiftCertificate.class);
-        verify(giftCertificateRepository).update(updateArgument.capture());
+        verify(giftCertificateRepository).save(updateArgument.capture());
 
         String expected = "cert3";
         String actual = updateArgument.getValue().getName();
@@ -136,20 +146,20 @@ class GiftCertificateServiceImplTest {
 
     @ParameterizedTest
     @ValueSource(longs = 12L)
-    void delete(Long id) {
+    void delete(Long id) throws ServiceException {
         giftCertificateService.delete(id);
-        verify(giftCertificateRepository, times(1)).delete(id);
+        verify(giftCertificateRepository, times(1)).deleteById(id);
     }
 
     @ParameterizedTest
     @ValueSource(longs = 3L)
     void unbindTag(Long id) throws ServiceException {
-        GiftCertificate certificate = giftCertificateService.findOne(id).get();
+        GiftCertificate certificate = giftCertificateService.findById(id).get();
 
         giftCertificateService.unbindTag(id, 1L);
 
-        verify(giftCertificateRepository, times(2)).findOne(id);
-        verify(giftCertificateRepository).update(any(GiftCertificate.class));
+        verify(giftCertificateRepository, times(2)).findById(id);
+        verify(giftCertificateRepository).save(any(GiftCertificate.class));
 
         assertTrue(certificate.getTags().isEmpty());
     }

@@ -37,8 +37,7 @@ class OrderControllerTest {
     void getOrderCertificatesWithPagination(Long id) throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/orders/{id}/certificates", id)
                 .param("page", "1")
-                .param("limit", "2"))
-                .andExpect(handler().handlerType(OrderController.class))
+                .param("size", "2")).andExpect(handler().handlerType(OrderController.class))
                 .andExpect(handler().methodName("getOrderCertificates"))
                 .andExpect(jsonPath("$.page.totalElements").value(5))
                 .andExpect(jsonPath("$.page.size").value(2))

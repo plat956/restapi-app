@@ -10,9 +10,10 @@ import com.epam.esm.exception.ResourceNotFoundException;
 import com.epam.esm.exception.ServiceException;
 import com.epam.esm.service.OrderService;
 import com.epam.esm.service.UserService;
-import com.epam.esm.util.RequestedPage;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.hateoas.CollectionModel;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
@@ -31,7 +32,7 @@ public class UserController {
     private OrderService orderService;
     private UserModelAssembler userModelAssembler;
     private OrderDtoModelAssembler orderDtoModelAssembler;
-    private UserStatisticsDtoModelAssembler statModelAssembler;
+    private UserStatisticsDtoModelAssembler userStatisticsDtoModelAssembler;
 
     @Autowired
     public UserController(UserService userService, OrderService orderService) {
@@ -50,8 +51,8 @@ public class UserController {
     }
 
     @Autowired
-    public void setStatModelAssembler(UserStatisticsDtoModelAssembler statModelAssembler) {
-        this.statModelAssembler = statModelAssembler;
+    public void setUserStatisticsDtoModelAssembler(UserStatisticsDtoModelAssembler userStatisticsDtoModelAssembler) {
+        this.userStatisticsDtoModelAssembler = userStatisticsDtoModelAssembler;
     }
 
     /**
@@ -62,38 +63,34 @@ public class UserController {
      */
     @GetMapping("/{id}")
     public EntityModel<User> getOneUser(@PathVariable("id") Long id) {
-        User user = userService.findOne(id).orElseThrow(() -> new ResourceNotFoundException(id));
+        User user = userService.findById(id).orElseThrow(() -> new ResourceNotFoundException(id));
         return userModelAssembler.toModelWithAllLink(user);
     }
 
     /**
      * Get all users.
      *
-     * @param page the requested page
-     * @param limit the requested records per page limit
+     * @param pageable object containing page and size request parameters
      * @return all available users
      */
     @GetMapping
-    public CollectionModel<EntityModel<User>> getAllUsers(@RequestParam(value = "page", required = false) Long page,
-                                                          @RequestParam(value = "limit", required = false) Long limit) {
-        PagedModel<User> users = userService.findAllPaginated(new RequestedPage(page, limit));
-        return userModelAssembler.toCollectionModel(users);
+    public PagedModel<User> getAllUsers(@PageableDefault Pageable pageable) {
+        Page<User> users = userService.findAll(pageable);
+        return userModelAssembler.toPagedModel(users);
     }
 
     /**
      * Get all user orders.
      *
      * @param userId the user id
-     * @param page the requested page
-     * @param limit the requested records per page limit
+     * @param pageable object containing page and size request parameters
      * @return the all available user orders
      */
     @GetMapping("/{id}/orders")
-    public CollectionModel<EntityModel<OrderDto>> getAllOrders(@PathVariable("id") Long userId,
-                                                               @RequestParam(value = "page", required = false) Long page,
-                                                               @RequestParam(value = "limit", required = false) Long limit) {
-        PagedModel<OrderDto> orders = orderService.findByUserIdPaginated(userId, new RequestedPage(page, limit));
-        return orderDtoModelAssembler.toCollectionModel(orders, userId);
+    public PagedModel<OrderDto> getAllOrders(@PathVariable("id") Long userId,
+                                             @PageableDefault Pageable pageable) {
+        Page<OrderDto> orders = orderService.findByUserId(userId, pageable);
+        return orderDtoModelAssembler.toPagedModel(orders);
     }
 
     /**
@@ -117,14 +114,12 @@ public class UserController {
     /**
      * Get top users statistics.
      *
-     * @param page the requested page
-     * @param limit the requested records per page limit
+     * @param pageable object containing page and size request parameters
      * @return the top users statistics
      */
     @GetMapping("/statistics")
-    public PagedModel<EntityModel<UserStatisticsDto>> getStatistics(@RequestParam(value = "page", required = false) Long page,
-                                                                    @RequestParam(value = "limit", required = false) Long limit) {
-        PagedModel<UserStatisticsDto> statistics = userService.findUserStatistics(new RequestedPage(page, limit));
-        return statModelAssembler.toCollectionModel(statistics);
+    public PagedModel<UserStatisticsDto> getStatistics(@PageableDefault Pageable pageable) {
+        Page<UserStatisticsDto> userStatisticsDtos = userService.findUserStatistics(pageable);
+        return userStatisticsDtoModelAssembler.toPagedModel(userStatisticsDtos);
     }
 }

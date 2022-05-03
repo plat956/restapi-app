@@ -34,14 +34,14 @@ public class TagServiceImplTest {
 
     @Test
     void findOne() {
-        when(tagRepository.findOne(anyLong())).thenAnswer(invocation -> {
+        when(tagRepository.findById(anyLong())).thenAnswer(invocation -> {
             Tag t = new Tag();
             t.setId(invocation.getArgument(0));
             t.setName("test name");
             return Optional.of(t);
         });
 
-        Optional<Tag> actual = tagService.findOne(51L);
+        Optional<Tag> actual = tagService.findById(51L);
         assertTrue(actual.isPresent());
     }
 
@@ -53,8 +53,8 @@ public class TagServiceImplTest {
     }
 
     @Test
-    void delete() {
+    void delete() throws ServiceException {
         tagService.delete(999L);
-        verify(tagRepository, times(1)).delete(anyLong());
+        verify(tagRepository, times(1)).deleteById(anyLong());
     }
 }

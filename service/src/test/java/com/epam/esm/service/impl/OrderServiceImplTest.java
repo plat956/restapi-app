@@ -8,7 +8,6 @@ import com.epam.esm.exception.EntityMappingException;
 import com.epam.esm.exception.ServiceException;
 import com.epam.esm.mapper.EntityMapper;
 import com.epam.esm.repository.OrderRepository;
-import com.epam.esm.util.RequestedPage;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -16,7 +15,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.hateoas.PagedModel;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -41,9 +43,9 @@ class OrderServiceImplTest {
 
     @ParameterizedTest
     @ValueSource(longs = 10L)
-    void findByUserIdPaginated(Long id) {
+    void findByUserId(Long id) {
         int totalOrders = 10;
-        when(orderRepository.findByUserIdPaginated(anyLong(), any(RequestedPage.class))).thenAnswer(invocation -> {
+        when(orderRepository.findByUserId(anyLong(), any(Pageable.class))).thenAnswer(invocation -> {
             List<Order> orders = new ArrayList<>();
             for(int i = 0; i < totalOrders; i++) {
                 Order o = new Order();
@@ -61,20 +63,18 @@ class OrderServiceImplTest {
                 o.setCost(BigDecimal.valueOf(12.20));
                 orders.add(o);
             }
-            RequestedPage page = invocation.getArgument(1);
-            PagedModel.PageMetadata metadata = new PagedModel.PageMetadata(page.getLimit(), page.getPage(), totalOrders);
-            PagedModel<Order> model = PagedModel.of(orders, metadata);
-            return model;
+            Pageable page = invocation.getArgument(1);
+            return new PageImpl<>(orders, page, totalOrders);
         });
 
-        RequestedPage page = new RequestedPage(2L, 3L);
-        PagedModel<OrderDto> result = orderService.findByUserIdPaginated(id, page);
+        Pageable page = PageRequest.of(2, 3);
+        Page<OrderDto> result = orderService.findByUserId(id, page);
 
-        verify(orderRepository).findByUserIdPaginated(id, page);
+        verify(orderRepository).findByUserId(id, page);
         verify(orderMapper, times(totalOrders)).toDto(any());
 
-        Long actual = result.getMetadata().getTotalPages();
-        assertEquals(4L, actual);
+        Integer actual = result.getTotalPages();
+        assertEquals(4, actual);
     }
 
     @ParameterizedTest

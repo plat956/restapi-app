@@ -2,8 +2,8 @@ package com.epam.esm.service;
 
 import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.exception.ServiceException;
-import com.epam.esm.util.RequestedPage;
-import org.springframework.hateoas.PagedModel;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
@@ -19,15 +19,7 @@ public interface GiftCertificateService {
      * @param id the gift certificate id
      * @return the optional with a gift certificate object if it exists, otherwise the empty optional
      */
-    Optional<GiftCertificate> findOne(Long id);
-
-    /**
-     * Find all gift certificates.
-     *
-     * @param page the requested page
-     * @return the paged model with a list of gift certificates or empty one
-     */
-    PagedModel<GiftCertificate> findAllPaginated(RequestedPage page);
+    Optional<GiftCertificate> findById(Long id);
 
     /**
      * Find all gift certificates parametrized.
@@ -37,10 +29,10 @@ public interface GiftCertificateService {
      * @param sort        the sequence of fields to sort the result,
      *                    start with ordering type (+ ASC or - DESC) and a field to sort (available fields: createDate, lastUpdateDate, name).
      *                    Eg. -createDate,+name
-     * @param page the requested page
-     * @return the paged model with a list of suitable gift certificates
+     * @param pageable object containing page and size request parameters
+     * @return the page object with suitable gift certificates
      */
-    PagedModel<GiftCertificate> findAllPaginated(List<String> tags, String search, List<String> sort, RequestedPage page);
+    Page<GiftCertificate> findAll(List<String> tags, String search, List<String> sort, Pageable pageable);
 
     /**
      * Save a gift certificate.
@@ -65,7 +57,7 @@ public interface GiftCertificateService {
      *
      * @param id the gift certificate id
      */
-    void delete(Long id);
+    void delete(Long id) throws ServiceException;
 
     /**
      * Unbind a tag from a certificate.
@@ -82,8 +74,8 @@ public interface GiftCertificateService {
      * Find gift certificates by order id.
      *
      * @param id   the gift certificate id
-     * @param page the requested page
-     * @return the paged model with a list of found certificates
+     * @param pageable object containing page and size request parameters
+     * @return the page object with found certificates
      */
-    PagedModel<GiftCertificate> findByOrderIdPaginated(Long id, RequestedPage page);
+    Page<GiftCertificate> findByOrderId(Long id, Pageable pageable);
 }

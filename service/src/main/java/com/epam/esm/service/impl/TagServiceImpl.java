@@ -5,10 +5,11 @@ import com.epam.esm.exception.ServiceException;
 import com.epam.esm.repository.TagRepository;
 import com.epam.esm.service.TagService;
 import com.epam.esm.util.MessageProvider;
-import com.epam.esm.util.RequestedPage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.hateoas.PagedModel;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -26,13 +27,13 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public Optional<Tag> findOne(Long id) {
-        return tagRepository.findOne(id);
+    public Optional<Tag> findById(Long id) {
+        return tagRepository.findById(id);
     }
 
     @Override
-    public PagedModel<Tag> findAllPaginated(RequestedPage page) {
-        return tagRepository.findAllPaginated(page);
+    public Page<Tag> findAll(Pageable pageable) {
+        return tagRepository.findAll(pageable);
     }
 
     @Override
@@ -45,7 +46,11 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public void delete(Long id) {
-        tagRepository.delete(id);
+    public void delete(Long id) throws ServiceException {
+        try {
+            tagRepository.deleteById(id);
+        } catch (EmptyResultDataAccessException e) {
+            throw new ServiceException(messageProvider.getMessage("message.error.no-tag"), e);
+        }
     }
 }

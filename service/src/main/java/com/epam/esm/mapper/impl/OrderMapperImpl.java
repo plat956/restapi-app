@@ -47,14 +47,14 @@ public class OrderMapperImpl implements EntityMapper<OrderDto, Order> {
 
     @Override
     public Order toEntity(OrderDto dto) throws EntityMappingException {
-        User user = userRepository.findOne(dto.getUserId())
+        User user = userRepository.findById(dto.getUserId())
                 .orElseThrow(() -> new EntityMappingException(String.format(messageProvider.getMessage("message.error.user-not-found"),
                         dto.getUserId())));
 
         List<GiftCertificate> certificates = new ArrayList<>(dto.getCertificates().size());
 
         for(Long certId: dto.getCertificates()) {
-            GiftCertificate certificate = giftCertificateRepository.findOne(certId)
+            GiftCertificate certificate = giftCertificateRepository.findById(certId)
                     .orElseThrow(() -> new EntityMappingException(messageProvider.getMessage("message.error.certificate-not-found") + certId));
             certificates.add(certificate);
         }

@@ -7,9 +7,10 @@ import com.epam.esm.exception.ServiceException;
 import com.epam.esm.mapper.EntityMapper;
 import com.epam.esm.repository.OrderRepository;
 import com.epam.esm.service.OrderService;
-import com.epam.esm.util.RequestedPage;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.hateoas.PagedModel;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -28,8 +29,8 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Optional<OrderDto> findOne(Long id) {
-        Optional<Order> order = orderRepository.findOne(id);
+    public Optional<OrderDto> findById(Long id) {
+        Optional<Order> order = orderRepository.findById(id);
         if(order.isPresent()) {
             return Optional.of(orderMapper.toDto(order.get()));
         } else {
@@ -38,10 +39,10 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public PagedModel<OrderDto> findByUserIdPaginated(Long id, RequestedPage page) {
-        PagedModel<Order> orders = orderRepository.findByUserIdPaginated(id, page);
+    public Page<OrderDto> findByUserId(Long id, Pageable pageable) {
+        Page<Order> orders = orderRepository.findByUserId(id, pageable);
         List<OrderDto> orderDtos = orders.getContent().stream().map(orderMapper::toDto).toList();
-        return PagedModel.of(orderDtos, orders.getMetadata());
+        return new PageImpl<>(orderDtos, orders.getPageable(), orders.getTotalElements());
     }
 
     @Override

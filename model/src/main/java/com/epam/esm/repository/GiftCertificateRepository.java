@@ -1,14 +1,19 @@
 package com.epam.esm.repository;
 
 import com.epam.esm.entity.GiftCertificate;
-import com.epam.esm.util.RequestedPage;
-import org.springframework.hateoas.PagedModel;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
 
-import java.util.List;
+import static com.epam.esm.repository.QueryStorage.CERTIFICATES_COUNT_BY_ORDER_ID;
+import static com.epam.esm.repository.QueryStorage.CERTIFICATES_FIND_BY_ORDER_ID;
 
-public interface GiftCertificateRepository extends BaseRepository<Long, GiftCertificate> {
+@Repository
+public interface GiftCertificateRepository extends JpaRepository<GiftCertificate, Long>, JpaSpecificationExecutor<GiftCertificate> {
 
-    PagedModel<GiftCertificate> findAllPaginated(List<String> tags, String search,
-                                                 List<String> sort, RequestedPage page);
-    PagedModel<GiftCertificate> findByOrderIdPaginated(Long id, RequestedPage page);
+    @Query(value = CERTIFICATES_FIND_BY_ORDER_ID, nativeQuery = true, countQuery = CERTIFICATES_COUNT_BY_ORDER_ID)
+    Page<GiftCertificate> findByOrderId(Long id, Pageable page);
 }

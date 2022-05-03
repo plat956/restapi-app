@@ -1,24 +1,19 @@
 package com.epam.esm.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import org.springframework.hateoas.RepresentationModel;
 import org.springframework.hateoas.server.core.Relation;
 
 import java.math.BigDecimal;
-import java.util.HashSet;
-import java.util.Set;
 
 @Data
-@NoArgsConstructor
+@AllArgsConstructor
 @Relation(collectionRelation = "user_statistics")
-public class UserStatisticsDto {
+public class UserStatisticsDto extends RepresentationModel<UserStatisticsDto> {
 
     private Long userId;
     private BigDecimal maxAmount;
-    private Set<TagStatisticsDto> tags = new HashSet<>();
-
-    public UserStatisticsDto(Long userId, BigDecimal maxAmount) {
-        this.userId = userId;
-        this.maxAmount = maxAmount;
-    }
+    private Long tagId;
+    private Integer tagCount;
 }

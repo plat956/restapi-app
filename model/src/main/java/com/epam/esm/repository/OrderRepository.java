@@ -1,10 +1,13 @@
 package com.epam.esm.repository;
 
 import com.epam.esm.entity.Order;
-import com.epam.esm.util.RequestedPage;
-import org.springframework.hateoas.PagedModel;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-public interface OrderRepository extends BaseRepository<Long, Order>{
+@Repository
+public interface OrderRepository extends JpaRepository<Order, Long> {
 
-    PagedModel<Order> findByUserIdPaginated(Long id, RequestedPage page);
+    Page<Order> findByUserId(Long id, Pageable page);
 }

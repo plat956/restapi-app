@@ -6,9 +6,10 @@ import com.epam.esm.exception.ResourceDuplicateException;
 import com.epam.esm.exception.ResourceNotFoundException;
 import com.epam.esm.exception.ServiceException;
 import com.epam.esm.service.TagService;
-import com.epam.esm.util.RequestedPage;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.hateoas.CollectionModel;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
@@ -28,23 +29,25 @@ public class TagController {
     private TagModelAssembler tagModelAssembler;
 
     @Autowired
-    public TagController(TagService tagService, TagModelAssembler tagModelAssembler) {
+    public TagController(TagService tagService) {
         this.tagService = tagService;
+    }
+
+    @Autowired
+    public void setTagModelAssembler(TagModelAssembler tagModelAssembler) {
         this.tagModelAssembler = tagModelAssembler;
     }
 
     /**
      * Get all tags.
      *
-     * @param page the requested page
-     * @param limit the requested records per page limit
+     * @param pageable object containing page and size request parameters
      * @return all available tags
      */
     @GetMapping
-    public CollectionModel<EntityModel<Tag>> getAll(@RequestParam(value = "page", required = false) Long page,
-                                                    @RequestParam(value = "limit", required = false) Long limit) {
-        PagedModel<Tag> tags = tagService.findAllPaginated(new RequestedPage(page, limit));
-        return tagModelAssembler.toCollectionModel(tags);
+    public PagedModel<Tag> getAll(@PageableDefault Pageable pageable) {
+        Page<Tag> tags = tagService.findAll(pageable);
+        return tagModelAssembler.toPagedModel(tags);
     }
 
     /**
@@ -55,7 +58,7 @@ public class TagController {
      */
     @GetMapping("/{id}")
     public EntityModel<Tag> getOne(@PathVariable("id") Long id) {
-        Tag tag = tagService.findOne(id).orElseThrow(() -> new ResourceNotFoundException(id));
+        Tag tag = tagService.findById(id).orElseThrow(() -> new ResourceNotFoundException(id));
         return tagModelAssembler.toModelWithAllLink(tag);
     }
 
@@ -84,6 +87,10 @@ public class TagController {
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable("id") Long id) {
-        tagService.delete(id);
+        try {
+            tagService.delete(id);
+        } catch (ServiceException ex) {
+            throw new ResourceNotFoundException(id);
+        }
     }
 }

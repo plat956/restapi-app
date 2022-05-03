@@ -39,7 +39,7 @@ class UserControllerTest {
     void getAllUsers() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/users")
                 .param("page", "2")
-                .param("limit", "100"))
+                .param("size", "100"))
                 .andExpect(handler().handlerType(UserController.class))
                 .andExpect(handler().methodName("getAllUsers"))
                 .andExpect(status().isOk())
