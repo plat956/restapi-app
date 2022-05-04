@@ -3,6 +3,7 @@ package com.epam.esm.service.impl;
 import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.entity.Tag;
 import com.epam.esm.exception.ServiceException;
+import com.epam.esm.repository.CustomGiftCertificateRepository;
 import com.epam.esm.repository.GiftCertificateRepository;
 import com.epam.esm.repository.TagRepository;
 import com.epam.esm.service.GiftCertificateService;
@@ -22,15 +23,12 @@ import java.util.Optional;
 
 @Service
 public class GiftCertificateServiceImpl implements GiftCertificateService {
-//
-//    private static final String ORDER_TYPE_REGEX = "^(\\+|\\-).*$";
-//    private static final String NEGATIVE_SIGN = "-";
-//    private static final String PERCENT_SIGN = "%";
 
     private GiftCertificateRepository giftCertificateRepository;
     private TagRepository tagRepository;
     private ModelMapper modelMapper;
     private MessageProvider messageProvider;
+    private CustomGiftCertificateRepository customGiftCertificateRepository;
 
     @Autowired
     public void setGiftCertificateRepository(GiftCertificateRepository giftCertificateRepository) {
@@ -58,6 +56,11 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
         this.messageProvider = messageProvider;
     }
 
+    @Autowired
+    public void setCustomGiftCertificateRepository(CustomGiftCertificateRepository customGiftCertificateRepository) {
+        this.customGiftCertificateRepository = customGiftCertificateRepository;
+    }
+
     @Override
     public Optional<GiftCertificate> findById(Long id) {
         return giftCertificateRepository.findById(id);
@@ -65,9 +68,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
 
     @Override
     public Page<GiftCertificate> findAll(List<String> tags, String search, List<String> sort, Pageable pageable) {
-//        Specification<GiftCertificate> specification = buildSpecification(tags, search, sort);
-//        return giftCertificateRepository.findAll(specification, PageRequest.of(page, size));
-        return null; //fixme
+        return customGiftCertificateRepository.findAll(tags, search, sort, pageable);
     }
 
     @Override
@@ -111,86 +112,6 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     public Page<GiftCertificate> findByOrderId(Long id, Pageable pageable) {
         return giftCertificateRepository.findByOrderId(id, pageable);
     }
-
-//    private Specification<GiftCertificate> buildSpecification(List<String> tags, String search, List<String> sort) {
-//        return (certRoot, criteriaQuery, criteriaBuilder) -> {
-//            List<Predicate> wherePredicates = new ArrayList<>();
-//            List<Predicate> subWherePredicates = new ArrayList<>();
-//            Subquery subQuery = criteriaQuery.subquery(Long.class);
-//            Root subRoot = subQuery.from(GiftCertificate.class);
-//            subQuery.select(criteriaBuilder.count(subRoot.get("id")));
-//
-//            if (tags != null && !tags.isEmpty()) {
-//                addFilteringByTags(criteriaBuilder, criteriaQuery, certRoot, tags, wherePredicates);
-//                addFilteringByTags(criteriaBuilder, subQuery, subRoot, tags, subWherePredicates);
-//            }
-//            if (search != null) {
-//                addSearch(criteriaBuilder, certRoot, search, wherePredicates);
-//                addSearch(criteriaBuilder, subRoot, search, subWherePredicates);
-//            }
-//            if (sort != null && !sort.isEmpty()) {
-//                addOrdering(criteriaBuilder, criteriaQuery, certRoot, sort);
-//            }
-//
-//            if(!subWherePredicates.isEmpty()) {
-//                subWherePredicates.add(criteriaBuilder.equal(certRoot.get("id"), subRoot.get("id")));
-//                subQuery.where(subWherePredicates.toArray(Predicate[]::new));
-//                if (tags != null && !tags.isEmpty()) {
-//                    wherePredicates.add(criteriaBuilder.equal(subQuery, tags.size()));
-//                }
-//            }
-//            //criteriaQuery.distinct(true);
-//            return criteriaBuilder.and(wherePredicates.toArray(Predicate[]::new));
-//        };
-//    }
-//
-//    private void addFilteringByTags(CriteriaBuilder cb, AbstractQuery cq, Root<GiftCertificate> certRoot,
-//                                    List<String> tags, List<Predicate> wherePredicates) {
-//        Join<GiftCertificate, Tag> tagJoin = certRoot.join("tags", JoinType.LEFT);
-//        Predicate[] tagPredicates = new Predicate[tags.size()];
-//
-//        for(int i = 0; i < tags.size(); i++) {
-//            Predicate p = cb.equal(tagJoin.get("name"), tags.get(i));
-//            tagPredicates[i] = p;
-//        }
-//
-//        wherePredicates.add(cb.or(tagPredicates));
-//
-//        cq.groupBy(certRoot.get("id"));
-//    }
-//
-//    private void addSearch(CriteriaBuilder cb, Root<GiftCertificate> certRoot,
-//                           String search, List<Predicate> wherePredicates) {
-//        search = PERCENT_SIGN + search.toLowerCase() + PERCENT_SIGN;
-//        Predicate searchPredicate = cb.or(
-//                cb.like(cb.lower(certRoot.get("name")), search),
-//                cb.like(cb.lower(certRoot.get("description")), search)
-//        );
-//        wherePredicates.add(searchPredicate);
-//    }
-//
-//    private void addOrdering(CriteriaBuilder cb, CriteriaQuery cq, Root<GiftCertificate> certRoot, List<String> sort) {
-//        List<Order> orderList = new ArrayList<>();
-//        List<String> allowedColumns = List.of("name", "createDate", "lastUpdateDate");
-//        OrderType orderType;
-//        String orderColumn;
-//        for (String f: sort) {
-//            String field = f.trim();
-//            if (field.matches(ORDER_TYPE_REGEX)) {
-//                orderType = field.startsWith(NEGATIVE_SIGN) ? DESC : ASC;
-//                orderColumn = field.substring(1);
-//            } else {
-//                orderType = ASC;
-//                orderColumn = field;
-//            }
-//            if (allowedColumns.contains(orderColumn)) {
-//                Path column = certRoot.get(orderColumn);
-//                Order order = orderType == ASC ? cb.asc(column) : cb.desc(column);
-//                orderList.add(order);
-//            }
-//        }
-//        cq.orderBy(orderList);
-//    }
 
     private void saveTags(GiftCertificate certificate) {
         certificate.getTags().forEach(t -> {

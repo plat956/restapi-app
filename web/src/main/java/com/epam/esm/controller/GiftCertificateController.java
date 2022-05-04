@@ -6,6 +6,7 @@ import com.epam.esm.exception.ResourceNotFoundException;
 import com.epam.esm.exception.ServiceException;
 import com.epam.esm.service.GiftCertificateService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.hateoas.EntityModel;
@@ -52,9 +53,8 @@ public class GiftCertificateController {
                                                            @RequestParam(value = "search", required = false) String search,
                                                            @RequestParam(value = "sorts", required = false) List<String> sorts,
                                                            @PageableDefault Pageable pageable) {
-//        Page<GiftCertificate> certificates = giftCertificateService.findAll(tags, search, sort, page, size);
-//        return certificateModelAssembler.toPagedModel(certificates);
-        return null; //fixme
+        Page<GiftCertificate> certificates = giftCertificateService.findAll(tags, search, sorts, pageable);
+        return certificateModelAssembler.toPagedModel(certificates);
     }
 
     /**
