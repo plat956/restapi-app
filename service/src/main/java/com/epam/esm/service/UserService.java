@@ -16,7 +16,7 @@ public interface UserService {
      * Find one user.
      *
      * @param id the user id
-     * @return the optional with a user object if it exists, otherwise the empty optional
+     * @return the optional with a user object if it exists, otherwise the empty one
      */
     Optional<User> findById(Long id);
 
@@ -35,4 +35,13 @@ public interface UserService {
      * @return the page object with top users
      */
     Page<UserStatisticsDto> findUserStatistics(Pageable pageable);
+
+
+    /**
+     * Find user by login.
+     *
+     * @param login the user login
+     * @return the optional with a user object if it exists, otherwise the empty one
+     */
+    Optional<User> findByLogin(String login);
 }

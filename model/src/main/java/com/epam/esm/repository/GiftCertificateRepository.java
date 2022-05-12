@@ -15,6 +15,9 @@ import static com.epam.esm.repository.QueryStorage.CERTIFICATES_FIND_BY_ORDER_ID
 @Repository
 public interface GiftCertificateRepository extends JpaRepository<GiftCertificate, Long>, JpaSpecificationExecutor<GiftCertificate> {
 
-    @Query(value = CERTIFICATES_FIND_BY_ORDER_ID, nativeQuery = true, countQuery = CERTIFICATES_COUNT_BY_ORDER_ID)
+    @Query(value = CERTIFICATES_FIND_BY_ORDER_ID,
+            countQuery = CERTIFICATES_COUNT_BY_ORDER_ID,
+            nativeQuery = true
+    )
     Page<GiftCertificate> findByOrderId(@Param("id") Long id, Pageable page);
 }

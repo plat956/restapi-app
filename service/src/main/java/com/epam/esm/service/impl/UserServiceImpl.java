@@ -43,6 +43,11 @@ public class UserServiceImpl implements UserService {
         return new PageImpl<>(dtos, tuples.getPageable(), tuples.getTotalElements());
     }
 
+    @Override
+    public Optional<User> findByLogin(String login) {
+        return userRepository.findByLogin(login);
+    }
+
     private UserStatisticsDto mapTupleToStatisticsDto(Tuple tuple) {
         Long userId = tuple.get("user_id", BigInteger.class).longValue();
         BigDecimal maxAmount = tuple.get("max_amount", BigDecimal.class);

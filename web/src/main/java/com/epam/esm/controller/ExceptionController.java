@@ -6,6 +6,9 @@ import com.epam.esm.exception.ResourceNotFoundException;
 import com.epam.esm.util.MessageProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -68,6 +71,24 @@ public class ExceptionController {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResourceError wrongArgument(MethodArgumentTypeMismatchException e) {
         return new ResourceError(40004, messageProvider.getMessage("message.error.wrong-param") + e.getName());
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResourceError invalidBody() {
+        return new ResourceError(40005, messageProvider.getMessage("message.error.wrong-body"));
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    @ResponseStatus(value = HttpStatus.FORBIDDEN)
+    public ResourceError badCredentialsExceptionException() {
+        return new ResourceError(40301, messageProvider.getMessage("message.error.wrong-credentials"));
+    }
+
+    @ExceptionHandler(DisabledException.class)
+    @ResponseStatus(value = HttpStatus.FORBIDDEN)
+    public ResourceError disabledException() {
+        return new ResourceError(40302, messageProvider.getMessage("message.error.account-disabled"));
     }
 
     @ExceptionHandler(Exception.class)
