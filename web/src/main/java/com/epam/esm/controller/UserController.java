@@ -16,10 +16,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
-import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
-import javax.validation.Valid;
 
 /**
  * The User REST API controller.
@@ -86,6 +84,7 @@ public class UserController {
      * @param pageable object containing page and size request parameters
      * @return the all available user orders
      */
+    @PreAuthorize("#userId == authentication.principal.id")
     @GetMapping("/{id}/orders")
     public PagedModel<OrderDto> getAllOrders(@PathVariable("id") Long userId,
                                              @PageableDefault Pageable pageable) {
@@ -94,20 +93,21 @@ public class UserController {
     }
 
     /**
-     * Create a new user order.
+     * Change a user status.
      *
-     * @param userId   the user id
-     * @param orderDto the order DTO with ids of obtaining certificates
-     * @return the created order data
+     * @param id the requested user id
+     * @param active a new status of a user account
+     * @return the updated user model
      */
-    @PostMapping("/{id}/orders")
-    @ResponseStatus(HttpStatus.CREATED)
-    public EntityModel<OrderDto> createOrder(@PathVariable("id") Long userId, @RequestBody @Valid OrderDto orderDto) {
+    @PreAuthorize("hasRole('ADMIN')")
+    @PatchMapping("/{id}/status")
+    public EntityModel<User> changeStatus(@PathVariable("id") Long id,
+                                          @RequestParam("active") Boolean active) {
         try {
-            OrderDto o = orderService.create(userId, orderDto);
-            return orderDtoModelAssembler.toModelWithAllLink(o);
-        } catch (ServiceException ex) {
-            throw new ResourceNotFoundException(ex.getMessage());
+            User user = userService.changeStatus(id, active ? User.Status.ACTIVE : User.Status.LOCKED);
+            return userModelAssembler.toModelWithAllLink(user);
+        } catch (ServiceException e) {
+            throw new ResourceNotFoundException(id);
         }
     }
 

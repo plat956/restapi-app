@@ -12,6 +12,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -50,9 +51,9 @@ public class GiftCertificateController {
      */
     @GetMapping
     public PagedModel<GiftCertificate> getAll(@RequestParam(value = "tags", required = false) List<String> tags,
-                                                           @RequestParam(value = "search", required = false) String search,
-                                                           @RequestParam(value = "sorts", required = false) List<String> sorts,
-                                                           @PageableDefault Pageable pageable) {
+                                              @RequestParam(value = "search", required = false) String search,
+                                              @RequestParam(value = "sorts", required = false) List<String> sorts,
+                                              @PageableDefault Pageable pageable) {
         Page<GiftCertificate> certificates = giftCertificateService.findAll(tags, search, sorts, pageable);
         return certificateModelAssembler.toPagedModel(certificates);
     }
@@ -76,6 +77,7 @@ public class GiftCertificateController {
      * @param giftCertificate the gift certificate json object
      * @return the gift certificate saved data
      */
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public EntityModel<GiftCertificate> save(@RequestBody @Valid GiftCertificate giftCertificate) {
@@ -90,6 +92,7 @@ public class GiftCertificateController {
      * @param source the json object with only fields to be updated
      * @return the updated gift certificate
      */
+    @PreAuthorize("hasRole('ADMIN')")
     @PatchMapping("/{id}")
     public EntityModel<GiftCertificate> update(@PathVariable("id") Long id,
                                                @RequestBody GiftCertificate source) {
@@ -108,6 +111,7 @@ public class GiftCertificateController {
      * @param tagId     the tag id to be removed
      * @return the gift certificate without the removed tag
      */
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{certId}/tags/{tagId}")
     public EntityModel<GiftCertificate> unbindTag(@PathVariable("certId") Long certId,
                                                   @PathVariable("tagId") Long tagId) {
@@ -124,6 +128,7 @@ public class GiftCertificateController {
      *
      * @param id the gift certificate id
      */
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable("id") Long id) {

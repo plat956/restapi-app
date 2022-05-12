@@ -22,7 +22,7 @@ public class OrderDtoModelAssembler extends AbstractModelAssembler<OrderDto> {
                 .getOneUser(entity.getUserId()))
                 .withRel("userInfo");
         Link certificatesLink = linkTo(methodOn(OrderController.class)
-                .getOrderCertificates(entity.getId(), null))
+                .getOrderCertificates(entity.getId(), null, null))
                 .withRel("certificatesInfo").expand();
         entity.add(selfLink).add(userLink).add(certificatesLink);
         return EntityModel.of(entity);

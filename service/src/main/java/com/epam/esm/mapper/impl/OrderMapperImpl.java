@@ -14,7 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -66,7 +66,7 @@ public class OrderMapperImpl implements EntityMapper<OrderDto, Order> {
         order.setUser(user);
         order.setGiftCertificates(certificates);
         order.setCost(cost);
-        order.setPurchaseTimestamp(Instant.now().toEpochMilli());
+        order.setPurchaseDate(LocalDateTime.now());
         return order;
     }
 

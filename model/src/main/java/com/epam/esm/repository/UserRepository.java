@@ -22,4 +22,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Page<Tuple> findUserStatistics(Pageable page);
 
     Optional<User> findByLogin(String login);
+
+    Boolean existsByLogin(String login);
 }

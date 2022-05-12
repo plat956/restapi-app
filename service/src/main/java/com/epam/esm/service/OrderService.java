@@ -39,4 +39,13 @@ public interface OrderService {
      * or any obtaining certificate from orderDto not found
      */
     OrderDto create(Long userId, OrderDto orderDto) throws ServiceException;
+
+    /**
+     * Check user access to an order.
+     *
+     * @param orderId the order id
+     * @param userId  the user id
+     * @return the boolean represents if access granted or not
+     */
+    boolean checkAccess(Long orderId, Long userId);
 }

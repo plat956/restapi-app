@@ -57,4 +57,9 @@ public class OrderServiceImpl implements OrderService {
         orderRepository.save(order);
         return orderMapper.toDto(order);
     }
+
+    @Override
+    public boolean checkAccess(Long orderId, Long userId) {
+        return orderRepository.existsByIdAndUserId(orderId, userId);
+    }
 }

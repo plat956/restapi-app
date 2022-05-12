@@ -7,6 +7,7 @@ import org.springframework.hateoas.server.core.Relation;
 
 import javax.validation.constraints.NotEmpty;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -23,5 +24,5 @@ public class OrderDto extends RepresentationModel<OrderDto> {
 
     private BigDecimal cost;
 
-    private Long purchaseTimestamp;
+    private LocalDateTime purchaseDate;
 }

@@ -7,6 +7,7 @@ import com.epam.esm.util.MessageProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
@@ -89,6 +90,11 @@ public class ExceptionController {
     @ResponseStatus(value = HttpStatus.FORBIDDEN)
     public ResourceError disabledException() {
         return new ResourceError(40302, messageProvider.getMessage("message.error.account-disabled"));
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    @ResponseStatus(value = HttpStatus.FORBIDDEN)
+    public void accessDeniedException() {
     }
 
     @ExceptionHandler(Exception.class)

@@ -20,7 +20,7 @@ import java.util.Set;
 public class User extends BaseEntity<Long>{
 
     public enum Status {
-        ACTIVE, BANNED
+        ACTIVE, LOCKED
     }
 
     @Column(nullable = false)

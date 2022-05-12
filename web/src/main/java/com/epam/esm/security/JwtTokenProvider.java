@@ -1,11 +1,11 @@
 package com.epam.esm.security;
 
-import com.epam.esm.exception.JwtAuthenticationException;
 import com.epam.esm.util.MessageProvider;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -23,6 +23,7 @@ import java.util.function.Function;
 
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
+@Log4j2
 @Component
 public class JwtTokenProvider {
 
@@ -73,7 +74,8 @@ public class JwtTokenProvider {
             Date expiration = parseClaim(token, Claims::getExpiration);
             return !expiration.before(now);
         } catch (JwtException | IllegalArgumentException e) {
-            throw new JwtAuthenticationException(messageProvider.getMessage("message.error.wrong-jwt"));
+            log.debug("Token is invalid or expired", e);
+            return false;
         }
     }
 
