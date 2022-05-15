@@ -1,0 +1,27 @@
+buildscript {
+    ext {
+        mockitoVersion = "4.4.0"
+    }
+}
+
+plugins {
+    id "java-library"
+}
+
+group "com.epam.esm"
+version "1.0-SNAPSHOT"
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    api project(":model")
+    testImplementation "org.junit.jupiter:junit-jupiter:$junitVersion"
+    testImplementation "org.mockito:mockito-core:$mockitoVersion"
+    testImplementation "org.mockito:mockito-junit-jupiter:$mockitoVersion"
+}
+
+test {
+    useJUnitPlatform()
+}

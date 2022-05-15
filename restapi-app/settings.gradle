@@ -1,0 +1,5 @@
+rootProject.name = 'restapi-app'
+include 'web'
+include 'service'
+include 'model'
+include 'log'

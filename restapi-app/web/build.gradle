@@ -1,0 +1,30 @@
+buildscript {
+    ext {
+        h2Version = "2.1.212"
+    }
+}
+
+plugins {
+    id "java-library"
+}
+
+group "com.epam.esm"
+version "1.0-SNAPSHOT"
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    api project(":service")
+    api project(":log")
+    testImplementation("org.springframework.boot:spring-boot-starter-test") {
+        exclude group: "junit", module: "junit"
+    }
+    testImplementation "org.junit.jupiter:junit-jupiter:$junitVersion"
+    testImplementation "com.h2database:h2:$h2Version"
+}
+
+test {
+    useJUnitPlatform()
+}
