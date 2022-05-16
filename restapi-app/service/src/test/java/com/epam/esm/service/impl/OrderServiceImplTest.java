@@ -21,6 +21,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -59,7 +60,7 @@ class OrderServiceImplTest {
                 c.setId(1L);
                 o.setGiftCertificates(List.of(c));
 
-                o.setPurchaseTimestamp(1650528752084L);
+                o.setPurchaseDate(LocalDateTime.now());
                 o.setCost(BigDecimal.valueOf(12.20));
                 orders.add(o);
             }
@@ -82,7 +83,7 @@ class OrderServiceImplTest {
     void create(Long userId) throws ServiceException, EntityMappingException {
         OrderDto o = new OrderDto();
         o.setCertificates(List.of(10L, 11L, 12L, 34L));
-        o.setPurchaseTimestamp(1650528335256L);
+        o.setPurchaseDate(LocalDateTime.now());
         o.setCost(BigDecimal.valueOf(31.42));
 
         OrderDto spyDto = spy(o);

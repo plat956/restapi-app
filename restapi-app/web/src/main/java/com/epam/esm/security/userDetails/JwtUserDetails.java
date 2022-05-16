@@ -69,4 +69,9 @@ public class JwtUserDetails implements UserDetails {
     public LocalDate getBirthday() {
         return birthday;
     }
+
+    public boolean hasRole(String role) {
+        String authority = "ROLE_" + role;
+        return authorities.stream().anyMatch(a -> a.getAuthority().equals(authority));
+    }
 }

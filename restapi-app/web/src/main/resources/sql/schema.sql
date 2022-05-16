@@ -42,7 +42,7 @@ CREATE TABLE orders (
                         id int4 NOT NULL auto_increment,
                         operation varchar(255) NOT NULL,
                         timestamp int8 NOT NULL,
-                        purchase_timestamp int8 NOT NULL,
+                        purchase_date date,
                         user_id int8 NOT NULL,
                         cost numeric(19,2) NOT NULL
 )
@@ -72,10 +72,32 @@ CREATE TABLE users (
                        first_name varchar(255) NOT NULL,
                        last_name varchar(255) NOT NULL,
                        login varchar(255) NOT NULL,
-                       password varchar(255) NOT NULL
+                       password varchar(255) NOT NULL,
+                       status varchar(255) NOT NULL
 )
 ;
 
+-- ----------------------------
+-- Table structure for roles
+-- ----------------------------
+DROP TABLE IF EXISTS roles;
+CREATE TABLE roles (
+                      id int8 NOT NULL auto_increment,
+                      operation varchar(255) NOT NULL,
+                      timestamp int8 NOT NULL,
+                      name varchar(255) NOT NULL
+)
+;
+
+-- ----------------------------
+-- Table structure for user_role
+-- ----------------------------
+DROP TABLE IF EXISTS user_role;
+CREATE TABLE user_role (
+                      user_id int8 NOT NULL,
+                      role_id int8 NOT NULL
+)
+;
 
 -- ----------------------------
 -- Uniques structure for table gift_certificate_tag
@@ -131,3 +153,19 @@ ALTER TABLE order_certificate ADD CONSTRAINT fkrj5ul3jy6cil5g79jr6osfx5e FOREIGN
 -- Foreign Keys structure for table orders
 -- ----------------------------
 ALTER TABLE orders ADD CONSTRAINT fk32ql8ubntj5uh44ph9659tiih FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE ON UPDATE NO ACTION;
+
+-- ----------------------------
+-- Primary Key structure for table roles
+-- ----------------------------
+ALTER TABLE roles ADD CONSTRAINT roles_pkey PRIMARY KEY (id);
+
+-- ----------------------------
+-- Primary Key structure for table user_role
+-- ----------------------------
+ALTER TABLE user_role ADD CONSTRAINT user_role_pkey PRIMARY KEY (user_id, role_id);
+
+-- ----------------------------
+-- Foreign Keys structure for table user_role
+-- ----------------------------
+ALTER TABLE user_role ADD CONSTRAINT fkj345gk1bovqvfame88rcx7yyx FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE ON UPDATE NO ACTION;
+ALTER TABLE user_role ADD CONSTRAINT fkt7e7djp752sqn6w22i6ocqy6q FOREIGN KEY (role_id) REFERENCES roles (id) ON DELETE CASCADE ON UPDATE NO ACTION;

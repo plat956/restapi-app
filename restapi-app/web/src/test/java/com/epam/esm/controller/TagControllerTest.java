@@ -12,6 +12,7 @@ import org.springframework.boot.test.autoconfigure.json.AutoConfigureJson;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -23,6 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureJson
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
+@WithMockUser
 class TagControllerTest {
 
     @Autowired
@@ -59,6 +61,7 @@ class TagControllerTest {
 
     @ParameterizedTest
     @ValueSource(strings = "culture")
+    @WithMockUser(roles="ADMIN")
     void save(String tagName) throws Exception {
         Tag tag = new Tag();
         tag.setName(tagName);
@@ -72,6 +75,7 @@ class TagControllerTest {
 
     @ParameterizedTest
     @ValueSource(strings = "sport")
+    @WithMockUser(roles="ADMIN")
     void saveDuplicate(String tagName) throws Exception {
         Tag tag = new Tag();
         tag.setName(tagName);
@@ -85,6 +89,7 @@ class TagControllerTest {
 
     @ParameterizedTest
     @ValueSource(longs = 6L)
+    @WithMockUser(roles="ADMIN")
     void delete(Long id) throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/tags/{id}", id))
                 .andExpect(status().isOk());

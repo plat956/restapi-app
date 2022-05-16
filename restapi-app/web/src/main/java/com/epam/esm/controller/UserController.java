@@ -84,7 +84,7 @@ public class UserController {
      * @param pageable object containing page and size request parameters
      * @return the all available user orders
      */
-    @PreAuthorize("#userId == authentication.principal.id")
+    @PreAuthorize("#userId == authentication.principal.id OR hasRole('ADMIN')")
     @GetMapping("/{id}/orders")
     public PagedModel<OrderDto> getAllOrders(@PathVariable("id") Long userId,
                                              @PageableDefault Pageable pageable) {

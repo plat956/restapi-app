@@ -14,6 +14,9 @@ import org.springframework.boot.test.autoconfigure.json.AutoConfigureJson;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithAnonymousUser;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -38,6 +41,7 @@ class GiftCertificateControllerTest {
     private MockMvc mockMvc;
 
     @Test
+    @WithAnonymousUser
     void getAll() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/certificates"))
                 .andExpect(handler().handlerType(GiftCertificateController.class))
@@ -47,14 +51,15 @@ class GiftCertificateControllerTest {
     }
 
     @Test
+    @WithAnonymousUser
     void getAllParametrized() throws Exception {
         String tags = "online";
-        String sort = "+name,-createDate";
+        String sorts = "+name,-createDate";
         String search = "ificate";
 
         mockMvc.perform(MockMvcRequestBuilders.get("/certificates")
                 .param("tags", tags)
-                .param("sort", sort)
+                .param("sorts", sorts)
                 .param("search", search))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$._embedded.certificates[*].tags[?(@.name == \'online\')]").exists())
@@ -80,6 +85,7 @@ class GiftCertificateControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void save() throws Exception {
         GiftCertificate c = new GiftCertificate();
         c.setName("new cert");
@@ -107,6 +113,7 @@ class GiftCertificateControllerTest {
 
     @ParameterizedTest
     @CsvSource("3, updated descr, 100.78")
+    @WithMockUser(roles = "ADMIN")
     void update(Long id, String newDescription, BigDecimal newPrice) throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/certificates/{id}", id))
                 .andExpect(status().isOk())
@@ -136,6 +143,7 @@ class GiftCertificateControllerTest {
 
     @ParameterizedTest
     @CsvSource("4, 7")
+    @WithUserDetails(value = "test-admin", userDetailsServiceBeanName = "jwtUserDetailsService")
     void unbindTag(Long certId, Long tagId) throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/certificates/{id}", certId))
                 .andExpect(status().isOk())
@@ -148,6 +156,7 @@ class GiftCertificateControllerTest {
 
     @ParameterizedTest
     @ValueSource(longs = 5L)
+    @WithUserDetails(value = "test-admin", userDetailsServiceBeanName = "jwtUserDetailsService")
     void delete(Long id) throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/certificates/{id}", id))
                 .andExpect(status().isOk());

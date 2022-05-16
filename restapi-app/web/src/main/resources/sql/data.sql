@@ -43,19 +43,33 @@ COMMIT;
 -- Records of users
 -- ----------------------------
 BEGIN;
-INSERT INTO users (operation, timestamp, birthday, first_name, last_name, login, password) VALUES ('INSERT', 1650528752084, '2022-04-21', 'John', 'Doe', 'qwerty', '123');
-INSERT INTO users (operation, timestamp, birthday, first_name, last_name, login, password) VALUES ('INSERT', 1650528752084, '2022-04-21', 'Ivan', 'Petrov', 'ivan', '321');
+INSERT INTO users (operation, timestamp, birthday, first_name, last_name, login, password, status) VALUES ('INSERT', 1650528752084, '2022-04-21', 'John', 'Doe', 'qwerty', '$2a$10$tcfgRiKhNzjKzeogaRCzp.apsyiPu2ThUik9mx.0/tAqoJBAlrCG6', 'ACTIVE');
+INSERT INTO users (operation, timestamp, birthday, first_name, last_name, login, password, status) VALUES ('INSERT', 1650528752084, '2022-04-21', 'Ivan', 'Petrov', 'ivan', '$2a$10$tcfgRiKhNzjKzeogaRCzp.apsyiPu2ThUik9mx.0/tAqoJBAlrCG6', 'ACTIVE');
+INSERT INTO users (operation, timestamp, birthday, first_name, last_name, login, password, status) VALUES ('INSERT', 1650528752084, '2022-04-21', 'Peter', 'Parker', 'test-admin', '$2a$10$tcfgRiKhNzjKzeogaRCzp.apsyiPu2ThUik9mx.0/tAqoJBAlrCG6', 'ACTIVE');
 COMMIT;
 
 -- ----------------------------
 -- Records of orders
 -- ----------------------------
 BEGIN;
-INSERT INTO orders (operation, timestamp, purchase_timestamp, user_id, cost) VALUES ('INSERT', 1650705552456, 1650705552455, 1, '0.14');
-INSERT INTO orders (operation, timestamp, purchase_timestamp, user_id, cost) VALUES ('INSERT', 1650705552456, 1650705552455, 1, '1.11');
-INSERT INTO orders (operation, timestamp, purchase_timestamp, user_id, cost) VALUES ('INSERT', 1650705552456, 1650705552455, 1, '34.97');
-INSERT INTO orders (operation, timestamp, purchase_timestamp, user_id, cost) VALUES ('INSERT', 1650705552456, 1650705552455, 2, '100.00');
+INSERT INTO orders (operation, timestamp, purchase_date, user_id, cost) VALUES ('INSERT', 1650705552456, '2022-10-10', 1, '0.14');
+INSERT INTO orders (operation, timestamp, purchase_date, user_id, cost) VALUES ('INSERT', 1650705552456, '2021-11-30', 1, '1.11');
+INSERT INTO orders (operation, timestamp, purchase_date, user_id, cost) VALUES ('INSERT', 1650705552456, '2022-03-11', 1, '34.97');
+INSERT INTO orders (operation, timestamp, purchase_date, user_id, cost) VALUES ('INSERT', 1650705552456, '2020-01-01', 2, '100.00');
 COMMIT;
+
+-- ----------------------------
+-- Records of roles
+-- ----------------------------
+INSERT INTO roles VALUES (3, 'INSERT', 1651173877351, 'ROLE_USER');
+INSERT INTO roles VALUES (2, 'INSERT', 1651173877351, 'ROLE_ADMIN');
+
+-- ----------------------------
+-- Records of user_role
+-- ----------------------------
+INSERT INTO user_role VALUES (1, 3);
+INSERT INTO user_role VALUES (2, 3);
+INSERT INTO user_role VALUES (3, 2);
 
 -- ----------------------------
 -- Records of order_certificate

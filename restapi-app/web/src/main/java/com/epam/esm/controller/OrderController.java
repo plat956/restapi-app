@@ -64,7 +64,7 @@ public class OrderController {
      * @param id the order id
      * @return found order, otherwise error response with 40401 status code
      */
-    @PostAuthorize("returnObject.content.userId == authentication.principal.id")
+    @PostAuthorize("returnObject.content.userId == authentication.principal.id OR hasRole('ADMIN')")
     @GetMapping("/{id}")
     public EntityModel<OrderDto> getOne(@PathVariable("id") Long id) {
         OrderDto order = orderService.findById(id).orElseThrow(() -> new ResourceNotFoundException(id));
@@ -84,7 +84,7 @@ public class OrderController {
             @PathVariable("id") Long id,
             @PageableDefault Pageable pageable,
             @AuthenticationPrincipal JwtUserDetails user) {
-        if(!orderService.checkAccess(id, user.getId())) {
+        if(!orderService.checkAccess(id, user.getId()) && !user.hasRole("ADMIN")) {
             throw new AccessDeniedException(messageProvider.getMessage("message.error.access-denied"));
         }
         Page<GiftCertificate> certificates = certificateService.findByOrderId(id, pageable);
