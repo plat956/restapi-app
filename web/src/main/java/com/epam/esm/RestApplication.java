@@ -13,7 +13,6 @@ public class RestApplication extends SpringBootServletInitializer {
 		return application.sources(RestApplication.class);
 	}
 
-
 	public static void main(String[] args) {
 		SpringApplication.run(RestApplication.class, args);
 	}
