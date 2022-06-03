@@ -16,6 +16,7 @@ plugins {
     id "io.spring.dependency-management" version "${springDependencyManagementVersion}"
     id "application"
     id "war"
+    id "org.sonarqube" version "3.3"
 }
 
 group "com.epam.esm"
