@@ -18,7 +18,6 @@ repositories {
 
 jacoco {
     toolVersion = "$jacocoVersion"
-    reportsDirectory = layout.buildDirectory.dir("jacoco")
 }
 
 dependencies {
@@ -35,4 +34,8 @@ test {
 
 jacocoTestReport {
     dependsOn test
+
+    reports {
+        xml.enabled true
+    }
 }
