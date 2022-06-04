@@ -6,6 +6,7 @@ buildscript {
 
 plugins {
     id "java-library"
+    id "jacoco"
 }
 
 group "com.epam.esm"
@@ -13,6 +14,11 @@ version "1.0-SNAPSHOT"
 
 repositories {
     mavenCentral()
+}
+
+jacoco {
+    toolVersion = "$jacocoVersion"
+    reportsDirectory = layout.buildDirectory.dir("jacoco")
 }
 
 dependencies {
@@ -28,4 +34,9 @@ dependencies {
 
 test {
     useJUnitPlatform()
+    finalizedBy jacocoTestReport
+}
+
+jacocoTestReport {
+    dependsOn test
 }
